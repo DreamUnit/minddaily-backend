@@ -1,5 +1,5 @@
 {
-  "name": "dailymind-backend",
+  "name": "minddaily-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DreamUnit/dailymind-backend.git"
+    "url": "git+https://github.com/DreamUnit/minddaily-backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DreamUnit/dailymind-backend/issues"
+    "url": "https://github.com/DreamUnit/minddaily-backend/issues"
   },
-  "homepage": "https://github.com/DreamUnit/dailymind-backend#readme",
+  "homepage": "https://github.com/DreamUnit/minddaily-backend#readme",
   "dependencies": {
     "@apollo/server": "^4.10.0",
     "apollo-datasource": "^3.3.2",
