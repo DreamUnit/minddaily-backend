@@ -1,0 +1,7 @@
+{
+    "watch": ["src"],
+    "ext": "ts,json",
+    "ignore": ["src/**/*.spec.ts", "node_modules"],
+    "exec": "npm run compile && node ./dist/index.js",
+    "delay": 1000
+}
