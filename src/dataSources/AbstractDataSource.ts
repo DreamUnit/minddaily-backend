@@ -6,6 +6,8 @@ import {
 } from "./types/AbstractDataSource";
 
 export abstract class AbstractDataSource<T, R> {
+    public abstract connect();
+    public abstract close();
     public abstract read(table: string, opts: IReadOpts): Promise<R>;
     public abstract readById(id: string | number): Promise<R>;
     public abstract write(table: string, opts: IWriteOpts<T>): Promise<R>;

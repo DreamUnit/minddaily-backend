@@ -6,11 +6,12 @@ import http from "http";
 import cors from "cors";
 import { typeDefs } from "./graphql/schemas/index";
 import { resolvers } from "./graphql/resolvers/index";
-import mongoose from "mongoose";
+
 import dotenv from "dotenv";
 import { ILogger } from "./utils/types/Logger";
 import { WinstonLogger } from "./utils/logging/WinstonLogger";
 import { Logger } from "./utils/logging/Logger";
+import { MongodbDataSource } from "./dataSources/MongodbDataSource";
 
 dotenv.config();
 const logger: ILogger = new Logger(new WinstonLogger());
@@ -19,7 +20,9 @@ logger.info("This is an informational message");
 
 interface IContext {
     token?: string;
-    //     dataSources: {};
+    dataSources: {
+        mongodbDataSource: MongodbDataSource;
+    };
 }
 
 const app = express();
@@ -31,13 +34,10 @@ const server = new ApolloServer<IContext>({
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
-async function startServer() {
-    const mongoURI = process.env.MONGODB_CONNECTION_STRING;
-    mongoose
-        .connect(mongoURI)
-        .then(() => console.log("MongoDB connected successfully"))
-        .catch(err => console.error("MongoDB connection error:", err));
+const dataSource = new MongodbDataSource(process.env.MONGODB_CONNECTION_STRING);
 
+async function startServer() {
+    await dataSource.connect();
     await server.start();
 
     app.use(
@@ -47,7 +47,14 @@ async function startServer() {
         }),
         express.json(),
         expressMiddleware(server, {
-            context: async ({ req }) => ({ token: req.headers.token }),
+            context: async ({ req }): Promise<IContext> => {
+                return {
+                    token: req.headers.token as string | undefined,
+                    dataSources: {
+                        mongodbDataSource: dataSource,
+                    },
+                };
+            },
         })
     );
 

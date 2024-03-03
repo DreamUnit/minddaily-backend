@@ -5,9 +5,35 @@ import {
     IUpdateOpts,
     IWriteOpts,
 } from "./types/AbstractDataSource";
+import mongoose from "mongoose";
 
-// TODO
+// TODO change from any to actual types.
 export class MongodbDataSource implements AbstractDataSource<any, any> {
+    private connectionString: string;
+
+    constructor(connectionString: string) {
+        this.connectionString = connectionString;
+    }
+
+    public async connect() {
+        try {
+            await mongoose.connect(this.connectionString);
+
+            console.log("successful connection");
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    public async close(): Promise<void> {
+        try {
+            await mongoose.disconnect();
+            console.log("Mongoose connection closed.");
+        } catch (err) {
+            console.error("Error closing the mongoose connection", err);
+        }
+    }
+
     public softDelete(table: string, opts: IDeleteOpts): Promise<any> {
         throw new Error("Method not implemented.");
     }

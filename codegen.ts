@@ -11,7 +11,11 @@ const config: CodegenConfig = {
             plugins: ["typescript", "typescript-resolvers"],
             config: {
                 contextType: "../context#DataSourceContext",
-                mappers: {},
+                mappers: {
+                    User: "../models/User#User",
+                    Diary: "../models/Diary#Diary",
+                    DiaryNote: "../models/DiaryNotes#DiaryNote",
+                },
             },
         },
     },
