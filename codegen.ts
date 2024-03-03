@@ -12,9 +12,9 @@ const config: CodegenConfig = {
             config: {
                 contextType: "../context#DataSourceContext",
                 mappers: {
-                    User: "../models/User#User",
-                    Diary: "../models/Diary#Diary",
-                    DiaryNote: "../models/DiaryNotes#DiaryNote",
+                    User: "../models/User#IUser",
+                    Diary: "../models/Diary#IDiary",
+                    DiaryNote: "../models/DiaryNotes#IDiaryNote",
                 },
             },
         },

@@ -1,10 +1,10 @@
 import { IMetaProperties } from "./Common";
-import { IDiaryNotes } from "./DiaryNotes";
+import { IDiaryNote } from "./DiaryNotes";
 
-export interface DiaryModel extends IMetaProperties {
+export interface IDiary extends IMetaProperties {
     id: string;
     title: string;
     text: string;
     userUID: string;
-    notes: IDiaryNotes[];
+    notes: IDiaryNote[];
 }

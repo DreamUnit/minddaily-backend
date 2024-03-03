@@ -1,6 +1,6 @@
 import { IImage, IMetaProperties } from "./Common";
 
-export interface IDiaryNotes extends IMetaProperties {
+export interface IDiaryNote extends IMetaProperties {
     id: string;
     title: string;
     text: string;
