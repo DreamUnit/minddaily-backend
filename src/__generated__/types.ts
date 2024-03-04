@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { IUser } from '../models/User';
-import { IDiary } from '../models/Diary';
-import { IDiaryNote } from '../models/DiaryNotes';
+import { IUser } from '../grapqhl/mappers/User';
+import { IDiary } from '../grapqhl/mappers/Diary';
+import { IDiaryNote } from '../grapqhl/mappers/DiaryNotes';
 import { DataSourceContext } from '../context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -117,15 +117,8 @@ export type Image = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addUser: User;
   createDiary?: Maybe<Diary>;
   createDiaryNote?: Maybe<Diary>;
-};
-
-
-export type MutationAddUserArgs = {
-  email: Scalars['String']['input'];
-  username: Scalars['String']['input'];
 };
 
 
@@ -151,7 +144,6 @@ export type Query = {
   fetchUserById?: Maybe<FetchUserResponse>;
   fetchUsers?: Maybe<FetchUsersResponse>;
   fetchUsersByField?: Maybe<FetchUsersResponse>;
-  users: Array<User>;
 };
 
 
@@ -208,11 +200,10 @@ export type User = {
   createdAt: Scalars['DateTime']['output'];
   deletedDate?: Maybe<Scalars['DateTime']['output']>;
   diaries?: Maybe<Array<Maybe<Diary>>>;
-  email: Scalars['String']['output'];
+  email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  username: Scalars['String']['output'];
   version: Scalars['Int']['output'];
 };
 
@@ -425,7 +416,6 @@ export type ImageResolvers<ContextType = DataSourceContext, ParentType extends R
 };
 
 export type MutationResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'username'>>;
   createDiary?: Resolver<Maybe<ResolversTypes['Diary']>, ParentType, ContextType, RequireFields<MutationCreateDiaryArgs, 'title' | 'userId'>>;
   createDiaryNote?: Resolver<Maybe<ResolversTypes['Diary']>, ParentType, ContextType, RequireFields<MutationCreateDiaryNoteArgs, 'title' | 'userId'>>;
 };
@@ -440,7 +430,6 @@ export type QueryResolvers<ContextType = DataSourceContext, ParentType extends R
   fetchUserById?: Resolver<Maybe<ResolversTypes['FetchUserResponse']>, ParentType, ContextType, RequireFields<QueryFetchUserByIdArgs, 'id'>>;
   fetchUsers?: Resolver<Maybe<ResolversTypes['FetchUsersResponse']>, ParentType, ContextType, RequireFields<QueryFetchUsersArgs, 'skip' | 'take'>>;
   fetchUsersByField?: Resolver<Maybe<ResolversTypes['FetchUsersResponse']>, ParentType, ContextType, RequireFields<QueryFetchUsersByFieldArgs, 'filter'>>;
-  users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -448,11 +437,10 @@ export type UserResolvers<ContextType = DataSourceContext, ParentType extends Re
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   deletedDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   diaries?: Resolver<Maybe<Array<Maybe<ResolversTypes['Diary']>>>, ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   version?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

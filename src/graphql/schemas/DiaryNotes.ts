@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import gql from "graphql-tag";
 export const diaryNoteTypeDefs = gql`
     scalar DateTime
 

@@ -12,11 +12,9 @@ import { ILogger } from "./utils/types/Logger";
 import { WinstonLogger } from "./utils/logging/WinstonLogger";
 import { Logger } from "./utils/logging/Logger";
 import { MongodbDataSource } from "./dataSources/MongodbDataSource";
+import { DiaryModel } from "./models/Diary";
 
 dotenv.config();
-const logger: ILogger = new Logger(new WinstonLogger());
-
-logger.info("This is an informational message");
 
 interface IContext {
     token?: string;
@@ -34,7 +32,13 @@ const server = new ApolloServer<IContext>({
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
-const dataSource = new MongodbDataSource(process.env.MONGODB_CONNECTION_STRING);
+// need a better way of instantiating classes in the future.
+export const dataSource = new MongodbDataSource(
+    process.env.MONGODB_CONNECTION_STRING
+);
+export const diaryModel = new DiaryModel(dataSource);
+export const logger: ILogger = new Logger(new WinstonLogger());
+logger.info("This is an informational message");
 
 async function startServer() {
     await dataSource.connect();

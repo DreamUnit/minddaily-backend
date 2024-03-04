@@ -13,7 +13,7 @@ RUN  npm install
 RUN npm run build
 
 # Copy the server files into the container
-COPY . .
+COPY src ./src
 
 # Make port 4000 available to the world outside this container
 EXPOSE 4000

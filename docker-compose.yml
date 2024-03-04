@@ -11,8 +11,8 @@ services:
         depends_on:
             - mongodb
         volumes:
-            - ./server:/usr/src/app/server
-            - /usr/src/app/server/node_modules
+            - .:/usr/src/app # Mount the root directory to /usr/src/app in the container
+            - /usr/src/app/node_modules
     mongodb:
         image: mongo:latest
         environment:
