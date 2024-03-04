@@ -1,4 +1,7 @@
 import { gql } from "apollo-server";
+import { userTypeDefs } from "./User";
+import { diaryNoteTypeDefs } from "./DiaryNotes";
+import { diaryTypeDefs } from "./Diary";
 // temporary mock
 export const mockTypeDefs = gql`
     type User {
@@ -18,4 +21,9 @@ export const mockTypeDefs = gql`
     }
 `;
 
-export const typeDefs = [mockTypeDefs];
+export const typeDefs = [
+    mockTypeDefs,
+    userTypeDefs,
+    diaryNoteTypeDefs,
+    diaryTypeDefs,
+];

@@ -1,5 +1,5 @@
 import { gql } from "apollo-server";
-export const customerTypeDefs = gql`
+export const diaryTypeDefs = gql`
     scalar DateTime
 
     input DiaryFilterOpts {
@@ -21,8 +21,8 @@ export const customerTypeDefs = gql`
     type Diary {
         createdAt: DateTime!
         updatedAt: DateTime
-        deletedDate: DateTime;
-        version: Int!;
+        deletedDate: DateTime
+        version: Int!
         id: ID!
         userId: ID!
         title: String!
