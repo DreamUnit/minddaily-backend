@@ -1,27 +1,17 @@
 version: "3.8"
 services:
-    app:
+    server:
         build: .
         ports:
             - "4000:4000"
-        environment:
-            - MONGO_USERNAME=rootuser
-            - MONGO_PASSWORD=rootpass
-            - MONGO_HOSTNAME=mongodb
         depends_on:
             - mongodb
         volumes:
-            - .:/usr/src/app # Mount the root directory to /usr/src/app in the container
+            - .:/usr/src/app
             - /usr/src/app/node_modules
     mongodb:
         image: mongo:latest
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: rootuser
-            MONGO_INITDB_ROOT_PASSWORD: rootpass
-        volumes:
-            - mongodb_data:/data/db
         ports:
             - "27017:27017"
-
-volumes:
-    mongodb_data:
+        volumes:
+            - ./data/mongodb:/data/db

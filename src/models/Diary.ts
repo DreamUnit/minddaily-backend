@@ -1,27 +1,22 @@
-import { MongodbDataSource } from "../dataSources/MongodbDataSource";
+import { IDataSource } from "../dataSources/DataSource";
 import { IDiary } from "../graphql/mappers/Diary";
-import { IFilterOpts, IRead, IReadMany } from "./Common";
+import { IFilterOpts, IModel, IRead, IReadMany } from "./Common";
 
-// seperate into seperate file
-export interface IDiaryModel {
-    fetchDiaries(take: number, skip: number): Promise<IReadMany<IDiary>>;
-    fetchDiaryByField(filter: IFilterOpts): Promise<IReadMany<IDiary>>;
-    fetchDiaryById(id: string): Promise<IRead<IDiary>>;
-}
+export class DiaryModel implements IModel<IDiary> {
+    constructor(private dataSource: IDataSource) {}
 
-export class DiaryModel implements IDiaryModel {
-    constructor(private dataSource: MongodbDataSource) {}
-
-    async fetchDiaries(take: number, skip: number): Promise<IReadMany<IDiary>> {
-        // Implementation that uses this.dataSource to fetch products
+    async fetchById(id: string): Promise<IRead<IDiary>> {
+        // Implementation to fetch a diary by ID using dataSource
         throw new Error("not implemented yet");
     }
 
-    async fetchDiaryByField(filter: IFilterOpts): Promise<IReadMany<IDiary>> {
+    async fetchByField(filter: IFilterOpts): Promise<IReadMany<IDiary>> {
+        // Implementation to fetch diaries by a field using dataSource
         throw new Error("not implemented yet");
     }
 
-    async fetchDiaryById(id: string): Promise<IRead<IDiary>> {
+    async fetchMany(take: number, skip: number): Promise<IReadMany<IDiary>> {
+        // Implementation to fetch diaries with pagination using dataSource
         throw new Error("not implemented yet");
     }
 }

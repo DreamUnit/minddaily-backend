@@ -18,3 +18,9 @@ export interface IFilterOpts {
     stringValue?: string;
     intValue?: number;
 }
+
+interface IModel<T> {
+    fetchById(id: string): Promise<IRead<T>>;
+    fetchByField(filter: IFilterOpts): Promise<IReadMany<T>>;
+    fetchMany(take: number, skip: number): Promise<IReadMany<T>>;
+}

@@ -10,7 +10,7 @@ export const diaryResolvers = {
             { take, skip }: IPagination
         ): Promise<IReadMany<IDiary>> => {
             try {
-                const data = await diaryModel.fetchDiaries(take, skip);
+                const data = await diaryModel.fetchMany(take, skip);
                 return data;
             } catch (err) {
                 logger.error("Failed to fetch Diaries");

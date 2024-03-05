@@ -1,6 +1,6 @@
 FROM node:latest
 
-WORKDIR /usr/src/app
+WORKDIR ./
 
 # Copy package.json and package-lock.json (if available) for both server and client
 COPY package*.json .

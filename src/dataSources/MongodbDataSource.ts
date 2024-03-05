@@ -1,14 +1,13 @@
-import { AbstractDataSource } from "./AbstractDataSource";
+import { IDataSource } from "./DataSource";
 import {
     IDeleteOpts,
     IReadOpts,
     IUpdateOpts,
     IWriteOpts,
-} from "./types/AbstractDataSource";
+} from "./types/DataSource";
 import mongoose from "mongoose";
 
-// TODO change from any to actual types.
-export class MongodbDataSource implements AbstractDataSource<any, any> {
+export class MongodbDataSource implements IDataSource {
     private connectionString: string;
 
     constructor(connectionString: string) {
@@ -34,24 +33,24 @@ export class MongodbDataSource implements AbstractDataSource<any, any> {
         }
     }
 
-    public softDelete(table: string, opts: IDeleteOpts): Promise<any> {
+    public softDelete<R>(table: string, opts: IDeleteOpts): Promise<R> {
         throw new Error("Method not implemented.");
     }
-    public read(table: string, opts: IReadOpts): Promise<any> {
+    public read<R>(table: string, opts: IReadOpts): Promise<R> {
         throw new Error("Method not implemented.");
     }
-    public readById(id: string | number): Promise<any> {
+    public readById<R>(id: string | number): Promise<R> {
         throw new Error("Method not implemented.");
     }
-    public update(table: string, opts: IUpdateOpts<any>): Promise<any> {
-        throw new Error("Method not implemented.");
-    }
-
-    public write(table: string, opts: IWriteOpts<any>): Promise<any> {
+    public update<T, R>(table: string, opts: IUpdateOpts<T>): Promise<R> {
         throw new Error("Method not implemented.");
     }
 
-    public delete(table: string, opts: IDeleteOpts): Promise<any> {
+    public write<T, R>(table: string, opts: IWriteOpts<T>): Promise<R> {
+        throw new Error("Method not implemented.");
+    }
+
+    public delete<R>(table: string, opts: IDeleteOpts): Promise<R> {
         throw new Error("Method not implemented.");
     }
 }

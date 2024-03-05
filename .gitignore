@@ -3,3 +3,4 @@ dist
 .env
 combined.log
 __generated__
+data

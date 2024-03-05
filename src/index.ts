@@ -13,6 +13,8 @@ import { WinstonLogger } from "./utils/logging/WinstonLogger";
 import { Logger } from "./utils/logging/Logger";
 import { MongodbDataSource } from "./dataSources/MongodbDataSource";
 import { DiaryModel } from "./models/Diary";
+import { UserModel } from "./models/User";
+import { DiaryNotesModel } from "./models/DiaryNotes";
 
 dotenv.config();
 
@@ -36,7 +38,10 @@ const server = new ApolloServer<IContext>({
 export const dataSource = new MongodbDataSource(
     process.env.MONGODB_CONNECTION_STRING
 );
+export const userModel = new UserModel(dataSource);
 export const diaryModel = new DiaryModel(dataSource);
+export const diaryNotesModel = new DiaryNotesModel(dataSource);
+
 export const logger: ILogger = new Logger(new WinstonLogger());
 logger.info("This is an informational message");
 
