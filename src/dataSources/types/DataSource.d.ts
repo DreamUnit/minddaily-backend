@@ -1,19 +1,22 @@
-export interface IReadOpts {
-    filter?: Record<string, any>;
-    limit?: number;
-    sort?: Record<string, "asc" | "desc">;
+export interface IReadOpts<F, S> {
+    query?: any;
+    take?: number;
+    skip?: number;
+    sort?: F;
+    filter?: S;
 }
 
 export interface IWriteOpts<T> {
-    id: string | number;
-    request: T;
+    data: T;
 }
 
 export interface IUpdateOpts<T> {
-    id: string | number;
-    request: T;
+    id?: string | number;
+    query?: any;
+    data: Partial<T>;
 }
 
 export interface IDeleteOpts {
-    id: string | number;
+    id?: string | number;
+    query?: any;
 }

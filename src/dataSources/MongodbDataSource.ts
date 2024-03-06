@@ -1,11 +1,11 @@
 import { IDataSource } from "./DataSource";
+import mongoose from "mongoose";
 import {
     IDeleteOpts,
     IReadOpts,
     IUpdateOpts,
     IWriteOpts,
 } from "./types/DataSource";
-import mongoose from "mongoose";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
@@ -14,13 +14,13 @@ export class MongodbDataSource implements IDataSource {
         this.connectionString = connectionString;
     }
 
-    public async connect() {
+    public async connect(): Promise<void> {
         try {
             await mongoose.connect(this.connectionString);
-
-            console.log("successful connection");
+            console.log("MongoDB connection successful");
         } catch (err) {
-            console.log(err);
+            console.error("MongoDB connection error:", err);
+            throw err;
         }
     }
 
@@ -30,27 +30,63 @@ export class MongodbDataSource implements IDataSource {
             console.log("Mongoose connection closed.");
         } catch (err) {
             console.error("Error closing the mongoose connection", err);
+            throw err;
         }
     }
 
-    public softDelete<R>(table: string, opts: IDeleteOpts): Promise<R> {
-        throw new Error("Method not implemented.");
-    }
-    public read<R>(table: string, opts: IReadOpts): Promise<R> {
-        throw new Error("Method not implemented.");
-    }
-    public readById<R>(id: string | number): Promise<R> {
-        throw new Error("Method not implemented.");
-    }
-    public update<T, R>(table: string, opts: IUpdateOpts<T>): Promise<R> {
-        throw new Error("Method not implemented.");
-    }
-
-    public write<T, R>(table: string, opts: IWriteOpts<T>): Promise<R> {
-        throw new Error("Method not implemented.");
+    async softDelete<R>(source: string, opts: IDeleteOpts): Promise<R> {
+        const model = mongoose.model(source);
+        const document = await model
+            .findByIdAndUpdate(
+                opts.id,
+                { deletedAt: new Date() },
+                { new: true }
+            )
+            .exec();
+        return document;
     }
 
-    public delete<R>(table: string, opts: IDeleteOpts): Promise<R> {
-        throw new Error("Method not implemented.");
+    public async read<F, S, R>(
+        source: string,
+        opts: IReadOpts<F, S>
+    ): Promise<R[]> {
+        const model = mongoose.model(source);
+        const documents = await model
+            .find(opts.query, null, { take: opts.take, skip: opts.skip })
+            .exec();
+        return documents;
+    }
+
+    public async readById<R>(source: string, id: string | number): Promise<R> {
+        const model = mongoose.model(source);
+        const document = await model.findById(id).exec();
+        return document;
+    }
+
+    public async update<T, R>(
+        source: string,
+        opts: IUpdateOpts<T>
+    ): Promise<R> {
+        const model = mongoose.model(source);
+        const document = await model
+            .findByIdAndUpdate(opts.id, opts.data, { new: true })
+            .exec();
+        return document;
+    }
+
+    public async write<T, R>(source: string, opts: IWriteOpts<T>): Promise<R> {
+        const model = mongoose.model(source);
+        const document = new model(opts.data);
+        await document.save();
+        return document;
+    }
+
+    public async deleteById<R>(
+        source: string,
+        opts: IDeleteOpts
+    ): Promise<boolean> {
+        const model = mongoose.model(source);
+        const result = await model.deleteOne({ _id: opts.id }).exec();
+        return result.acknowledged;
     }
 }
