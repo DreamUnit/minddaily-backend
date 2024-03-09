@@ -26,10 +26,16 @@ Change .env.example to .env
 mv .env.example .env
 ```
 
-Start the server
+build the docker image
 
 ```
-npm start
+docker compose build
+```
+
+compose the docker image, starting the mongodb container and server container
+
+```
+docker compose up -d
 ```
 
 If all is successful, you should see something like:

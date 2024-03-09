@@ -6,6 +6,8 @@ WORKDIR ./
 COPY package*.json .
 COPY tsconfig.json .
 COPY nodemon.json .
+COPY .env .
+
 COPY src /src
 
 # Install server dependencies

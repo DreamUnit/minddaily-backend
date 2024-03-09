@@ -1,7 +1,6 @@
-import { IReadMany } from "../../models/Common";
 import { IDiary } from "../mappers/Diary";
-import { IPagination } from "../types/common";
-import { diaryModel, logger } from "../..";
+import { IPagination, IReadMany } from "../types/common";
+import { diaryModel } from "../..";
 
 export const diaryResolvers = {
     Query: {
@@ -11,9 +10,19 @@ export const diaryResolvers = {
         ): Promise<IReadMany<IDiary>> => {
             try {
                 const data = await diaryModel.fetchMany(take, skip);
-                return data;
+                return {
+                    code: 200,
+                    success: true,
+                    message: "Succesfully fetched Diaries",
+                    data,
+                };
             } catch (err) {
-                logger.error("Failed to fetch Diaries");
+                return {
+                    code: 500,
+                    success: false,
+                    message: "Failed to fetch Diaries",
+                    data: null,
+                };
             }
         },
     },

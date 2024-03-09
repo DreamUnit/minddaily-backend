@@ -6,20 +6,23 @@ import {
     IUpdateOpts,
     IWriteOpts,
 } from "./types/DataSource";
+import { ILogger } from "../utils/types/Logger";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
+    private logger: ILogger;
 
-    constructor(connectionString: string) {
+    constructor(connectionString: string, logger: ILogger) {
         this.connectionString = connectionString;
+        this.logger = logger;
     }
 
     public async connect(): Promise<void> {
         try {
             await mongoose.connect(this.connectionString);
-            console.log("MongoDB connection successful");
+            this.logger.info("MongoDB connection successful");
         } catch (err) {
-            console.error("MongoDB connection error:", err);
+            this.logger.error("MongoDB connection error:", err);
             throw err;
         }
     }
@@ -27,9 +30,9 @@ export class MongodbDataSource implements IDataSource {
     public async close(): Promise<void> {
         try {
             await mongoose.disconnect();
-            console.log("Mongoose connection closed.");
+            this.logger.info("Mongoose connection closed.");
         } catch (err) {
-            console.error("Error closing the mongoose connection", err);
+            this.logger.error("Error closing the mongoose connection", err);
             throw err;
         }
     }
@@ -46,9 +49,9 @@ export class MongodbDataSource implements IDataSource {
         return document;
     }
 
-    public async read<F, S, R>(
+    public async read<Filter, Sort, R>(
         source: string,
-        opts: IReadOpts<F, S>
+        opts: IReadOpts<Filter, Sort>
     ): Promise<R[]> {
         const model = mongoose.model(source);
         const documents = await model
@@ -63,9 +66,9 @@ export class MongodbDataSource implements IDataSource {
         return document;
     }
 
-    public async update<T, R>(
+    public async update<T, Query, R>(
         source: string,
-        opts: IUpdateOpts<T>
+        opts: IUpdateOpts<T, Query>
     ): Promise<R> {
         const model = mongoose.model(source);
         const document = await model
@@ -81,7 +84,7 @@ export class MongodbDataSource implements IDataSource {
         return document;
     }
 
-    public async deleteById<R>(
+    public async deleteById(
         source: string,
         opts: IDeleteOpts
     ): Promise<boolean> {
