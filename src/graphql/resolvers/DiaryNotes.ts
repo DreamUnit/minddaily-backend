@@ -1,45 +1,45 @@
-import { IDiary } from "../mappers/Diary";
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel } from "../..";
-import { DateTime } from "luxon";
-export const diaryResolvers = {
+import { diaryNotesModel } from "../..";
+import { IDiaryNote } from "../mappers/DiaryNotes";
+
+export const diaryNotesResolvers = {
     Query: {
-        readDiaries: async (
+        readDiaryNotes: async (
             _,
             { take, skip }: IPagination
-        ): Promise<IReadMany<IDiary>> => {
+        ): Promise<IReadMany<IDiaryNote>> => {
             try {
-                const data = await diaryModel.readMany(take, skip);
+                const data = await diaryNotesModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read Diaries",
+                    message: "Succesfully read Diary Notes",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read Diaries",
+                    message: "Failed to read Diary Notes",
                     data: null,
                 };
             }
         },
 
-        readDiaryById: async (_, { id }): Promise<IRead<IDiary>> => {
+        readDiaryNoteById: async (_, { id }): Promise<IRead<IDiaryNote>> => {
             try {
-                const data = await diaryModel.readById(id);
+                const data = await diaryNotesModel.readById(id);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read Diary",
+                    message: "Succesfully read Diary Notes",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read Diary",
+                    message: "Failed to read Diary Notes",
                     data: null,
                 };
             }
@@ -47,70 +47,72 @@ export const diaryResolvers = {
     },
 
     Mutation: {
-        createDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
+        createDiaryNote: async (
+            _,
+            { userId, title }
+        ): Promise<IRead<IDiaryNote>> => {
             try {
                 // type the input.
-                const data = await diaryModel.create({
-                    createdDate: DateTime.utc(),
-                    version: 1,
-                    userId: userId,
-                    title: title,
-                    notes: [],
-                });
-
-                return {
-                    code: 200,
-                    success: true,
-                    message: "Succesfully created Diary",
-                    data,
-                };
-            } catch (err) {
-                return {
-                    code: 500,
-                    success: false,
-                    message: `Failed to create Diary with error of: ${err}`,
-                    data: null,
-                };
-            }
-        },
-
-        updateDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
-            try {
-                // type the input.
-                const data = await diaryModel.create({
+                const data = await diaryNotesModel.create({
                     userId: userId,
                     title: title,
                 });
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully created Diary",
+                    message: "Succesfully created Diary Notes",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to update Diary",
+                    message: "Failed to create Diary Notes",
                     data: null,
                 };
             }
         },
 
-        deleteDiary: async (_, { id }): Promise<IDelete> => {
+        updateDiaryNote: async (
+            _,
+            { userId, title }
+        ): Promise<IRead<IDiaryNote>> => {
             try {
                 // type the input.
-                const data = await diaryModel.delete(id);
+                const data = await diaryNotesModel.create({
+                    userId: userId,
+                    title: title,
+                });
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully deleted Diary",
+                    message: "Succesfully update Diary Notes",
+                    data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to delete Diary",
+                    message: "Failed to update Diary Notes",
+                    data: null,
+                };
+            }
+        },
+
+        deleteDiaryNote: async (_, { id }): Promise<IDelete> => {
+            try {
+                // type the input.
+                const data = await diaryNotesModel.delete(id);
+                return {
+                    code: 200,
+                    success: true,
+                    message: "Succesfully deleted Diary Notes",
+                };
+            } catch (err) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: "Failed to delete Diary Notes",
                 };
             }
         },

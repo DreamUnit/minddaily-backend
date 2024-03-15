@@ -17,6 +17,9 @@ import { DiaryNotesModel } from "./models/DiaryNotes";
 import { addMocksToSchema } from "@graphql-tools/mock";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { DateTime } from "luxon";
+import { UserSchema } from "./schemas/UserSchema";
+import mongoose from "mongoose";
+
 dotenv.config();
 
 const mocks = {
@@ -41,11 +44,14 @@ const server =
               plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
           })
         : new ApolloServer<IContext>({
-              schema: addMocksToSchema({
-                  schema: makeExecutableSchema({ typeDefs, resolvers }),
-                  mocks,
-              }),
+              // schema: addMocksToSchema({
+              //     schema: makeExecutableSchema({ typeDefs, resolvers }),
+              //     mocks,
+              // }),
+              typeDefs,
+              resolvers,
               plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+              introspection: true,
           });
 
 // need a better way of instantiating classes in the future.
@@ -54,7 +60,7 @@ export const dataSource = new MongodbDataSource(
     process.env.MONGODB_DSN,
     logger
 );
-// export const UserSchemaModel = mongoose.model("User", UserSchema);
+export const UserSchemaModel = mongoose.model("users", UserSchema);
 export const userModel = new UserModel(dataSource);
 
 export const diaryModel = new DiaryModel(dataSource);

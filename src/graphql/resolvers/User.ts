@@ -1,45 +1,46 @@
-import { IDiary } from "../mappers/Diary";
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel } from "../..";
+import { userModel } from "../..";
+import { IUser } from "../mappers/User";
 import { DateTime } from "luxon";
-export const diaryResolvers = {
+import { ICreateUserRequest } from "../types/User";
+export const userResolvers = {
     Query: {
-        readDiaries: async (
+        readUsers: async (
             _,
             { take, skip }: IPagination
-        ): Promise<IReadMany<IDiary>> => {
+        ): Promise<IReadMany<IUser>> => {
             try {
-                const data = await diaryModel.readMany(take, skip);
+                const data = await userModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read Diaries",
+                    message: "Succesfully read Users",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read Diaries",
+                    message: "Failed to read Users",
                     data: null,
                 };
             }
         },
 
-        readDiaryById: async (_, { id }): Promise<IRead<IDiary>> => {
+        readUserById: async (_, { id }): Promise<IRead<IUser>> => {
             try {
-                const data = await diaryModel.readById(id);
+                const data = await userModel.readById(id);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read Diary",
+                    message: "Succesfully read User",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read Diary",
+                    message: "Failed to read User",
                     data: null,
                 };
             }
@@ -47,70 +48,78 @@ export const diaryResolvers = {
     },
 
     Mutation: {
-        createDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
+        createUser: async (
+            _,
+            { authUserId, name, email }
+        ): Promise<IRead<IUser>> => {
             try {
                 // type the input.
-                const data = await diaryModel.create({
-                    createdDate: DateTime.utc(),
-                    version: 1,
-                    userId: userId,
-                    title: title,
-                    notes: [],
+                const data = await userModel.create<ICreateUserRequest>({
+                    authUserId: authUserId,
+                    name: name,
+                    email: email,
+                    locale: "en-gb",
                 });
 
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully created Diary",
+                    message: "Succesfully created User",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: `Failed to create Diary with error of: ${err}`,
+                    message: "Failed to create User",
                     data: null,
                 };
             }
         },
 
-        updateDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
+        updateUser: async (
+            _,
+            { id, name, email, active, points, locale }
+        ): Promise<IRead<IUser>> => {
             try {
                 // type the input.
-                const data = await diaryModel.create({
-                    userId: userId,
-                    title: title,
+                const data = await userModel.update(id, {
+                    name: name,
+                    email: email,
+                    active: active,
+                    points: points,
+                    locale: locale,
                 });
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully created Diary",
+                    message: "Succesfully updated User",
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to update Diary",
+                    message: "Failed to update User",
                     data: null,
                 };
             }
         },
 
-        deleteDiary: async (_, { id }): Promise<IDelete> => {
+        deleteUser: async (_, { id }): Promise<IDelete> => {
             try {
                 // type the input.
-                const data = await diaryModel.delete(id);
+                const data = await userModel.delete(id);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully deleted Diary",
+                    message: "Succesfully deleted User",
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to delete Diary",
+                    message: "Failed to delete User",
                 };
             }
         },

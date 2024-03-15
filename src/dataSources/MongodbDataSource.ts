@@ -1,5 +1,5 @@
 import { IDataSource } from "./DataSource";
-import mongoose from "mongoose";
+
 import {
     IDeleteOpts,
     IReadOpts,
@@ -7,6 +7,7 @@ import {
     IWriteOpts,
 } from "./types/DataSource";
 import { ILogger } from "../utils/types/Logger";
+import mongoose, { Schema, Model } from "mongoose";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
@@ -42,13 +43,14 @@ export class MongodbDataSource implements IDataSource {
         const document = await model
             .findByIdAndUpdate(
                 opts.id,
-                { deletedAt: new Date() },
+                { deletedDate: new Date() },
                 { new: true }
             )
             .exec();
         return document;
     }
 
+    // Need to fix so it fetches count and considers filters and count
     public async read<Filter, Sort, R>(
         source: string,
         opts: IReadOpts<Filter, Sort>
@@ -77,19 +79,30 @@ export class MongodbDataSource implements IDataSource {
         return document;
     }
 
-    public async write<T, R>(source: string, opts: IWriteOpts<T>): Promise<R> {
-        const model = mongoose.model(source);
+    public async write<T, R>(
+        source: string,
+        model: Model<T>,
+        opts: IWriteOpts<T>
+    ): Promise<R> {
         const document = new model(opts.data);
         await document.save();
-        return document;
+
+        const savedDocument = await model.findById(document._id).exec();
+        console.log("Saved doc", savedDocument);
+        return savedDocument as R;
     }
 
-    public async deleteById(
+    public async deleteById<T>(
         source: string,
+        model: Model<T>,
         opts: IDeleteOpts
     ): Promise<boolean> {
-        const model = mongoose.model(source);
+        const isValid = mongoose.Types.ObjectId.isValid(opts.id);
+        if (!isValid) {
+            return false;
+        }
+
         const result = await model.deleteOne({ _id: opts.id }).exec();
-        return result.acknowledged;
+        return result.acknowledged && result.deletedCount > 0;
     }
 }

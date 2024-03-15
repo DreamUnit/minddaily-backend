@@ -1,3 +1,4 @@
+// query needs to be updated here to a generic here.
 export interface IReadOpts<Filter, Sort> {
     query?: any;
     take: number;

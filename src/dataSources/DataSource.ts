@@ -8,16 +8,22 @@ import {
 export interface IDataSource {
     connect(): void;
     close(): void;
+    // must change this, we cannot do it this way.
+    write<T, R>(source: string, schema: any, opts: IWriteOpts<T>): Promise<R>;
     read<Filter, Sort, R>(
         source: string,
         opts: IReadOpts<Filter, Sort>
     ): Promise<R[]>;
     readById<R>(source: string, id: string | number): Promise<R>;
-    write<T, R>(source: string, opts: IWriteOpts<T>): Promise<R>;
     update<T, Query, R>(
         source: string,
         opts: IUpdateOpts<T, Query>
     ): Promise<R>;
-    deleteById(source: string, opts: IDeleteOpts): Promise<boolean>;
+    // must change this, we cannot do it this way.
+    deleteById(
+        source: string,
+        schema: any,
+        opts: IDeleteOpts
+    ): Promise<boolean>;
     softDelete<R>(source: string, opts: IDeleteOpts): Promise<R>;
 }

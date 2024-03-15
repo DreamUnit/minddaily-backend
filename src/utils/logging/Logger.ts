@@ -1,6 +1,5 @@
 import { ILogger } from "../types/Logger";
 
-// change this to abstract class maybe?
 export class Logger {
     private logger: ILogger;
 

@@ -5,7 +5,10 @@ export interface IFilterOpts {
 }
 
 export interface IModel<T> {
-    fetchById(id: string): Promise<T>;
-    fetchByField(filter: IFilterOpts): Promise<T>;
-    fetchMany(take: number, skip: number): Promise<T[]>;
+    readById(id: string): Promise<T>;
+    readByField(filter: IFilterOpts): Promise<T>;
+    readMany(take: number, skip: number): Promise<T[]>;
+    create<Data>(data: Data): Promise<T>;
+    update<Data>(id: string | number, updatedData: Data): Promise<T>;
+    delete(id: string | number): Promise<boolean>;
 }

@@ -4,7 +4,6 @@ import { IDiaryNote } from "./DiaryNotes";
 export interface IDiary extends IMetaProperties {
     id: string;
     title: string;
-    text: string;
-    userUID: string;
+    userId: string;
     notes: IDiaryNote[];
 }

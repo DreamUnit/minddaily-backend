@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+
 export const diaryNoteTypeDefs = gql`
     scalar DateTime
 
@@ -9,15 +10,17 @@ export const diaryNoteTypeDefs = gql`
     }
 
     type Query {
-        fetchDiaryNotes(take: Int!, skip: Int!): FetchDiaryNotesResponse
-        fetchDiaryNotesByField(
+        readDiaryNotes(take: Int!, skip: Int!): ReadDiaryNotesResponse
+        readDiaryNotesByField(
             filter: DiaryNoteFilterOpts!
-        ): FetchDiaryNotesResponse
-        fetchDiaryNoteById(id: ID!): FetchDiaryNoteResponse
+        ): ReadDiaryNotesResponse
+        readDiaryNoteById(id: ID!): ReadDiaryNoteResponse
     }
 
     type Mutation {
-        createDiaryNote(userId: ID!, title: String!): Diary
+        createDiaryNote(userId: ID!, title: String!): ReadDiaryNoteResponse
+        updateDiaryNote(title: String!): ReadDiaryNoteResponse
+        deleteDiaryNote(id: ID!): ReadDiaryNoteResponse
     }
 
     type Image {
@@ -26,8 +29,8 @@ export const diaryNoteTypeDefs = gql`
     }
 
     type DiaryNote {
-        createdAt: DateTime!
-        updatedAt: DateTime
+        createdDate: DateTime!
+        updatedDate: DateTime
         deletedDate: DateTime
         version: Int!
         id: ID!
@@ -36,14 +39,14 @@ export const diaryNoteTypeDefs = gql`
         images: [Image]!
     }
 
-    type FetchDiaryNoteResponse {
+    type ReadDiaryNoteResponse {
         code: Int!
         success: Boolean!
         message: String
         data: DiaryNote
     }
 
-    type FetchDiaryNotesResponse {
+    type ReadDiaryNotesResponse {
         code: Int!
         success: Boolean!
         message: String

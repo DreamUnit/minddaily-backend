@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+
 export const diaryTypeDefs = gql`
     scalar DateTime
 
@@ -9,34 +10,36 @@ export const diaryTypeDefs = gql`
     }
 
     type Query {
-        fetchDiaries(take: Int!, skip: Int!): FetchDiariesResponse
-        fetchDiaryByField(filter: DiaryFilterOpts!): FetchDiariesResponse
-        fetchDiaryById(id: ID!): FetchDiaryResponse
+        readDiaries(take: Int!, skip: Int!): ReadDiariesResponse
+        readDiaryByField(filter: DiaryFilterOpts!): ReadDiariesResponse
+        readDiaryById(id: ID!): ReadDiaryResponse
     }
 
     type Mutation {
-        createDiary(userId: ID!, title: String!): Diary
+        createDiary(userId: ID!, title: String!): ReadDiaryResponse
+        updateDiary(title: String!): ReadDiaryResponse
+        deleteDiary(id: ID!): ReadDiaryResponse
     }
 
     type Diary {
-        createdAt: DateTime!
-        updatedAt: DateTime
+        createdDate: DateTime!
+        updatedDate: DateTime
         deletedDate: DateTime
         version: Int!
         id: ID!
         userId: ID!
         title: String!
-        notes: [DiaryNote!]!
+        notes: [DiaryNote]!
     }
 
-    type FetchDiaryResponse {
+    type ReadDiaryResponse {
         code: Int!
         success: Boolean!
         message: String
         data: Diary
     }
 
-    type FetchDiariesResponse {
+    type ReadDiariesResponse {
         code: Int!
         success: Boolean!
         message: String

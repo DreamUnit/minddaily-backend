@@ -10,35 +10,51 @@ export const userTypeDefs = gql`
     }
 
     type Query {
-        fetchUsers(take: Int!, skip: Int!): FetchUsersResponse
-        fetchUsersByField(filter: UserFilterOpts!): FetchUsersResponse
-        fetchUserById(id: ID!): FetchUserResponse
+        readUsers(take: Int!, skip: Int!): ReadUsersResponse
+        readUsersByField(filter: UserFilterOpts!): ReadUsersResponse
+        readUserById(id: ID!): ReadUserResponse
     }
 
     type Mutation {
-        createDiaryNote(userId: ID!, title: String!): Diary
+        createUser(
+            authUserId: ID!
+            email: String!
+            name: String!
+        ): ReadUserResponse
+        updateUser(
+            id: ID!
+            name: String
+            active: Boolean
+            email: String
+            points: Int
+            locale: String
+        ): ReadUserResponse
+        deleteUser(id: ID!): ReadUserResponse
     }
 
     type User {
-        createdAt: DateTime!
-        updatedAt: DateTime
+        createdDate: DateTime!
+        updatedDate: DateTime
         deletedDate: DateTime
         version: Int!
         id: ID!
         authUserId: String!
         email: String
         name: String
+        active: Boolean
+        points: Int
+        locale: String
         diaries: [Diary]
     }
 
-    type FetchUserResponse {
+    type ReadUserResponse {
         code: Int!
         success: Boolean!
         message: String
         data: User
     }
 
-    type FetchUsersResponse {
+    type ReadUsersResponse {
         code: Int!
         success: Boolean!
         message: String

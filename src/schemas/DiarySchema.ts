@@ -4,10 +4,9 @@ const { Schema } = mongoose;
 
 const DiarySchema = new Schema({
     title: { type: String, required: true },
-    text: { type: String, required: true },
-    userUID: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    notes: [{ type: Schema.Types.ObjectId, ref: "DiaryNote" }],
+    userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    notes: [{ type: Schema.Types.ObjectId, ref: "diary_notes" }],
     ...MetaPropertiesSchema.obj,
 });
 
-export const DiarySchemaModel = mongoose.model("User", DiarySchema);
+export const DiarySchemaModel = mongoose.model("diaries", DiarySchema);

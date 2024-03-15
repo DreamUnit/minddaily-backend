@@ -17,3 +17,9 @@ export interface IRead<T> {
     message: string;
     data: T;
 }
+
+export interface IDelete {
+    code: number;
+    success: boolean;
+    message: string;
+}
