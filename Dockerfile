@@ -18,8 +18,8 @@ RUN npm run build
 # Copy the server files into the container
 COPY src ./src
 
-# Make port 4000 available to the world outside this container
-EXPOSE 4000
+# Make port 8082 available to the world outside this container
+EXPOSE 8082
 
 # Run the app when the container launches
 CMD ["node", "dist/index.js"]
