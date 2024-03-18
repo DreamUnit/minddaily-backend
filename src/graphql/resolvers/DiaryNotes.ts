@@ -1,6 +1,10 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
 import { diaryNotesModel } from "../..";
 import { IDiaryNote } from "../mappers/DiaryNotes";
+import {
+    ICreateDiaryNoteRequest,
+    IUpdateDiaryNoteRequest,
+} from "../types/DiaryNote";
 
 export const diaryNotesResolvers = {
     Query: {
@@ -49,14 +53,15 @@ export const diaryNotesResolvers = {
     Mutation: {
         createDiaryNote: async (
             _,
-            { userId, title }
+            { userId, title, diaryId }
         ): Promise<IRead<IDiaryNote>> => {
             try {
-                // type the input.
-                const data = await diaryNotesModel.create({
-                    userId: userId,
-                    title: title,
-                });
+                const data =
+                    await diaryNotesModel.create<ICreateDiaryNoteRequest>({
+                        userId: userId,
+                        title: title,
+                        diaryId: diaryId,
+                    });
                 return {
                     code: 200,
                     success: true,
@@ -75,14 +80,13 @@ export const diaryNotesResolvers = {
 
         updateDiaryNote: async (
             _,
-            { userId, title }
+            { id, title }
         ): Promise<IRead<IDiaryNote>> => {
             try {
-                // type the input.
-                const data = await diaryNotesModel.create({
-                    userId: userId,
-                    title: title,
-                });
+                const data =
+                    await diaryNotesModel.update<IUpdateDiaryNoteRequest>(id, {
+                        title: title,
+                    });
                 return {
                     code: 200,
                     success: true,
@@ -101,7 +105,6 @@ export const diaryNotesResolvers = {
 
         deleteDiaryNote: async (_, { id }): Promise<IDelete> => {
             try {
-                // type the input.
                 const data = await diaryNotesModel.delete(id);
                 return {
                     code: 200,

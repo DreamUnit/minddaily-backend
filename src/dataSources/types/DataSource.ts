@@ -1,10 +1,14 @@
+import { SortOrder } from "mongoose";
+
 // query needs to be updated here to a generic here.
-export interface IReadOpts<Filter, Sort> {
+export interface IReadOpts<Filter> {
     query?: any;
     take: number;
     skip: number;
-    sort?: Filter;
-    filter?: Sort;
+    sort?: string | { [key: string]: SortOrder | { $meta: "textScore" } };
+    filter?: Filter;
+    relations?: string[];
+    select?: string[] | { [key: string]: 0 | 1 };
 }
 
 export interface IWriteOpts<T> {

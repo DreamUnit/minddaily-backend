@@ -51,14 +51,38 @@ export class MongodbDataSource implements IDataSource {
     }
 
     // Need to fix so it fetches count and considers filters and count
-    public async read<Filter, Sort, R>(
+    public async read<Filter, R>(
         source: string,
-        opts: IReadOpts<Filter, Sort>
+        opts: IReadOpts<Filter>
     ): Promise<R[]> {
+        // const model = mongoose.model(source);
+        // const documents = await model
+        //     .find(opts.query, null, { take: opts.take, skip: opts.skip })
+        //     .exec();
+        // return documents;
+        console.log("opts:", opts);
         const model = mongoose.model(source);
-        const documents = await model
-            .find(opts.query, null, { take: opts.take, skip: opts.skip })
-            .exec();
+        let query = model.find(opts.query);
+        console.log("query:", query);
+        if (opts.select) {
+            query = query.select(opts.select);
+        }
+        if (opts.relations) {
+            opts.relations.forEach(include => {
+                query = query.populate(include);
+            });
+        }
+        if (opts.sort) {
+            query = query.sort(opts.sort);
+        }
+        if (opts.skip !== undefined) {
+            query = query.skip(opts.skip);
+        }
+        if (opts.take !== undefined) {
+            query = query.limit(opts.take);
+        }
+        const documents = await query.exec();
+        console.log("documents:", documents);
         return documents;
     }
 

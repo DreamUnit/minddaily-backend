@@ -1,8 +1,8 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
 import { userModel } from "../..";
 import { IUser } from "../mappers/User";
-import { DateTime } from "luxon";
-import { ICreateUserRequest } from "../types/User";
+import { ICreateUserRequest, IUpdateUserRequest } from "../types/User";
+
 export const userResolvers = {
     Query: {
         readUsers: async (
@@ -14,14 +14,14 @@ export const userResolvers = {
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read Users",
+                    message: `Succesfully read Users`,
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read Users",
+                    message: `Failed to read Users with an error of: ${err}`,
                     data: null,
                 };
             }
@@ -33,14 +33,14 @@ export const userResolvers = {
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully read User",
+                    message: `Succesfully read User`,
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to read User",
+                    message: `Failed to read User with an error of: ${err}`,
                     data: null,
                 };
             }
@@ -53,25 +53,24 @@ export const userResolvers = {
             { authUserId, name, email }
         ): Promise<IRead<IUser>> => {
             try {
-                // type the input.
                 const data = await userModel.create<ICreateUserRequest>({
                     authUserId: authUserId,
                     name: name,
                     email: email,
-                    locale: "en-gb",
+                    locale: `en-gb`,
                 });
 
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully created User",
+                    message: `Succesfully created User`,
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to create User",
+                    message: `Failed to create User with an error of: ${err}`,
                     data: null,
                 };
             }
@@ -82,8 +81,7 @@ export const userResolvers = {
             { id, name, email, active, points, locale }
         ): Promise<IRead<IUser>> => {
             try {
-                // type the input.
-                const data = await userModel.update(id, {
+                const data = await userModel.update<IUpdateUserRequest>(id, {
                     name: name,
                     email: email,
                     active: active,
@@ -93,14 +91,14 @@ export const userResolvers = {
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully updated User",
+                    message: `Succesfully updated User`,
                     data,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to update User",
+                    message: `Failed to update User with an error of: ${err}`,
                     data: null,
                 };
             }
@@ -108,18 +106,17 @@ export const userResolvers = {
 
         deleteUser: async (_, { id }): Promise<IDelete> => {
             try {
-                // type the input.
                 const data = await userModel.delete(id);
                 return {
                     code: 200,
                     success: true,
-                    message: "Succesfully deleted User",
+                    message: `Succesfully deleted User`,
                 };
             } catch (err) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Failed to delete User",
+                    message: `Failed to delete User with an error of: ${err}`,
                 };
             }
         },

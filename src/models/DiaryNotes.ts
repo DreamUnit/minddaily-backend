@@ -68,7 +68,7 @@ export class DiaryNotesModel implements IModel<IDiaryNote> {
     }
 
     async readMany(take: number, skip: number): Promise<IDiaryNote[] | []> {
-        const data = await this.dataSource.read<IFilter, ISort, IDiaryNote>(
+        const data = await this.dataSource.read<IFilter, IDiaryNote>(
             this.source,
             {
                 take: take,

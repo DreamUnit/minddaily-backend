@@ -72,13 +72,10 @@ export class UserModel implements IModel<IUser> {
     }
 
     async readMany(take: number, skip: number): Promise<IUser[] | []> {
-        const data = await this.dataSource.read<IFilter, ISort, IUser>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
+        const data = await this.dataSource.read<IFilter, IUser>(this.source, {
+            take: take,
+            skip: skip,
+        });
         return data || [];
     }
 }

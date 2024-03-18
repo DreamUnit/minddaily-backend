@@ -67,13 +67,12 @@ export class DiaryModel implements IModel<IDiary> {
     }
 
     async readMany(take: number, skip: number): Promise<IDiary[] | []> {
-        const data = await this.dataSource.read<IFilter, ISort, IDiary>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
+        const data = await this.dataSource.read<IFilter, IDiary>(this.source, {
+            take: take,
+            skip: skip,
+            relations: ["users"],
+        });
+        console.log("data:", data);
         return data || [];
     }
 }
