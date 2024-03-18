@@ -41,7 +41,7 @@ docker compose up -d
 If all is successful, you should see something like:
 
 ```
-Server ready at: http://localhost:4000/
+Server ready at: http://localhost:8082/
 ```
 
 Open a fresh terminal and run graphql codegen to generate types

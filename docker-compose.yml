@@ -1,19 +1,10 @@
 version: "3.8"
 services:
-    server:
-        build: .
-        ports:
-            - "4000:4000"
-        depends_on:
-            - mongodb
-        volumes:
-            - .:/usr/src/app
-            - /usr/src/app/node_modules
-        env_file:
-            - .env
     mongodb:
         image: mongo:latest
         ports:
             - "27017:27017"
         volumes:
             - ./data/mongodb:/data/db
+volumes:
+    mongodb-data:
