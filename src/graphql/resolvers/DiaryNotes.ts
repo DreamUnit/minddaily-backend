@@ -53,13 +53,13 @@ export const diaryNotesResolvers = {
     Mutation: {
         createDiaryNote: async (
             _,
-            { userId, title, diaryId }
+            { title, text, diaryId }
         ): Promise<IRead<IDiaryNote>> => {
             try {
                 const data =
                     await diaryNotesModel.create<ICreateDiaryNoteRequest>({
-                        userId: userId,
                         title: title,
+                        text: text,
                         diaryId: diaryId,
                     });
                 return {
@@ -80,12 +80,13 @@ export const diaryNotesResolvers = {
 
         updateDiaryNote: async (
             _,
-            { id, title }
+            { id, title, text }
         ): Promise<IRead<IDiaryNote>> => {
             try {
                 const data =
                     await diaryNotesModel.update<IUpdateDiaryNoteRequest>(id, {
                         title: title,
+                        text: text,
                     });
                 return {
                     code: 200,

@@ -1,3 +1,4 @@
+import { isArray } from "@apollo/client/utilities";
 import { IDataSource } from "../dataSources/DataSource";
 import { IDiary } from "../graphql/mappers/Diary";
 import { DiarySchemaModel } from "../schemas/DiarySchema";
@@ -62,17 +63,21 @@ export class DiaryModel implements IModel<IDiary> {
         return null;
     }
 
-    async readByField(filter: IFilterOpts): Promise<IDiary | null> {
-        throw new Error("not implemented yet");
+    async readByField(filter: IFilterOpts): Promise<IDiary[] | null> {
+        const value = filter.stringValue || filter.intValue;
+        let queryResult = await this.dataSource.readByField<IDiary>(
+            this.source,
+            filter.field,
+            value
+        );
+        return isArray(queryResult) ? queryResult : [queryResult];
     }
 
     async readMany(take: number, skip: number): Promise<IDiary[] | []> {
         const data = await this.dataSource.read<IFilter, IDiary>(this.source, {
             take: take,
             skip: skip,
-            relations: ["users"],
         });
-        console.log("data:", data);
         return data || [];
     }
 }

@@ -1,5 +1,5 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { userModel } from "../..";
+import { diaryModel, userModel } from "../..";
 import { IUser } from "../mappers/User";
 import { ICreateUserRequest, IUpdateUserRequest } from "../types/User";
 
@@ -118,6 +118,21 @@ export const userResolvers = {
                     success: false,
                     message: `Failed to delete User with an error of: ${err}`,
                 };
+            }
+        },
+    },
+    User: {
+        diaries: async parent => {
+            try {
+                const diaries = await diaryModel.readByField({
+                    field: "userId",
+                    stringValue: parent.id,
+                });
+                console.log("diaries:", diaries);
+                return diaries;
+            } catch (err) {
+                console.error("Error fetching diaries :", err);
+                throw new Error("Failed to fetch diaries ");
             }
         },
     },

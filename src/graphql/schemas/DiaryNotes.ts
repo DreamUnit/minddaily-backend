@@ -11,15 +11,23 @@ export const diaryNoteTypeDefs = gql`
 
     type Query {
         readDiaryNotes(take: Int!, skip: Int!): ReadDiaryNotesResponse
-        readDiaryNotesByField(
-            filter: DiaryNoteFilterOpts!
-        ): ReadDiaryNotesResponse
+        # readDiaryNotesByField(
+        #     filter: DiaryNoteFilterOpts!
+        # ): ReadDiaryNotesResponse
         readDiaryNoteById(id: ID!): ReadDiaryNoteResponse
     }
 
     type Mutation {
-        createDiaryNote(userId: ID!, title: String!): ReadDiaryNoteResponse
-        updateDiaryNote(title: String!): ReadDiaryNoteResponse
+        createDiaryNote(
+            title: String!
+            text: String!
+            diaryId: ID!
+        ): ReadDiaryNoteResponse
+        updateDiaryNote(
+            id: ID!
+            title: String!
+            text: String
+        ): ReadDiaryNoteResponse
         deleteDiaryNote(id: ID!): ReadDiaryNoteResponse
     }
 
@@ -36,6 +44,7 @@ export const diaryNoteTypeDefs = gql`
         id: ID!
         diaryId: ID!
         title: String!
+        text: String
         images: [Image]!
     }
 

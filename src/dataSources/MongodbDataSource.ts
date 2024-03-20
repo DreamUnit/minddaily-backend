@@ -7,7 +7,7 @@ import {
     IWriteOpts,
 } from "./types/DataSource";
 import { ILogger } from "../utils/types/Logger";
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Model, Document, FilterQuery } from "mongoose";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
@@ -55,11 +55,6 @@ export class MongodbDataSource implements IDataSource {
         source: string,
         opts: IReadOpts<Filter>
     ): Promise<R[]> {
-        // const model = mongoose.model(source);
-        // const documents = await model
-        //     .find(opts.query, null, { take: opts.take, skip: opts.skip })
-        //     .exec();
-        // return documents;
         console.log("opts:", opts);
         const model = mongoose.model(source);
         let query = model.find(opts.query);
@@ -89,6 +84,19 @@ export class MongodbDataSource implements IDataSource {
     public async readById<R>(source: string, id: string | number): Promise<R> {
         const model = mongoose.model(source);
         const document = await model.findById(id).exec();
+        return document;
+    }
+
+    public async readByField<R>(
+        source: string,
+        field: string,
+        value: string | number
+    ): Promise<R[] | null> {
+        console.log("field:", field, "value:", value);
+        const model = mongoose.model<R>(source);
+        const query = { [field]: value } as mongoose.FilterQuery<R>;
+        console.log("query:", query);
+        const document = await model.find(query).exec();
         return document;
     }
 

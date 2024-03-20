@@ -1,3 +1,4 @@
+import { isArray } from "@apollo/client/utilities";
 import { UserSchemaModel } from "..";
 import { IDataSource } from "../dataSources/DataSource";
 import { IUser } from "../graphql/mappers/User";
@@ -67,8 +68,14 @@ export class UserModel implements IModel<IUser> {
         return null;
     }
 
-    async readByField(filter: IFilterOpts): Promise<IUser | null> {
-        throw new Error("not implemented yet");
+    async readByField(filter: IFilterOpts): Promise<IUser[] | null> {
+        const value = filter.stringValue || filter.intValue;
+        let queryResult = await this.dataSource.readByField<IUser>(
+            this.source,
+            filter.field,
+            value
+        );
+        return isArray(queryResult) ? queryResult : [queryResult];
     }
 
     async readMany(take: number, skip: number): Promise<IUser[] | []> {

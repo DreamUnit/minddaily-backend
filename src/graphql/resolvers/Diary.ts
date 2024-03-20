@@ -1,7 +1,8 @@
 import { IDiary } from "../mappers/Diary";
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel } from "../..";
+import { diaryModel, diaryNotesModel } from "../..";
 import { DateTime } from "luxon";
+import { IUpdateDiaryRequest } from "../types/Diary";
 export const diaryResolvers = {
     Query: {
         readDiaries: async (
@@ -55,7 +56,6 @@ export const diaryResolvers = {
                     version: 1,
                     userId: userId,
                     title: title,
-                    notes: [],
                 });
 
                 return {
@@ -74,10 +74,12 @@ export const diaryResolvers = {
             }
         },
 
-        updateDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
+        updateDiary: async (
+            _,
+            { id, userId, title }
+        ): Promise<IRead<IDiary>> => {
             try {
-                // type the input.
-                const data = await diaryModel.create({
+                const data = await diaryModel.update<IUpdateDiaryRequest>(id, {
                     userId: userId,
                     title: title,
                 });
@@ -112,6 +114,21 @@ export const diaryResolvers = {
                     success: false,
                     message: "Failed to delete Diary",
                 };
+            }
+        },
+    },
+    Diary: {
+        notes: async parent => {
+            try {
+                const diaryNotes = await diaryNotesModel.readByField({
+                    field: "diaryId",
+                    stringValue: parent.id,
+                });
+                console.log("diaryNotes:", diaryNotes);
+                return diaryNotes;
+            } catch (err) {
+                console.error("Error fetching diary notes:", err);
+                throw new Error("Failed to fetch diary notes");
             }
         },
     },

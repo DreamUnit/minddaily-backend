@@ -11,7 +11,7 @@ export const userTypeDefs = gql`
 
     type Query {
         readUsers(take: Int!, skip: Int!): ReadUsersResponse
-        readUsersByField(filter: UserFilterOpts!): ReadUsersResponse
+        # readUsersByField(filter: UserFilterOpts!): ReadUsersResponse
         readUserById(id: ID!): ReadUserResponse
     }
 

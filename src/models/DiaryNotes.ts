@@ -1,8 +1,10 @@
+import { isArray } from "@apollo/client/utilities";
 import { IDataSource } from "../dataSources/DataSource";
 import { IDiaryNote } from "../graphql/mappers/DiaryNotes";
 import { DiaryNoteSchemaModel } from "../schemas/DiaryNoteSchema";
 import { IFilterOpts, IModel } from "./types/Common";
 import { IFilter, ISort } from "./types/Diary";
+import { DateTime } from "luxon";
 
 export class DiaryNotesModel implements IModel<IDiaryNote> {
     private readonly source: string = "diary_notes";
@@ -11,14 +13,20 @@ export class DiaryNotesModel implements IModel<IDiaryNote> {
     constructor(private dataSource: IDataSource) {}
 
     async create<Data>(inputData: Data): Promise<IDiaryNote> {
+        console.log("create dataNote");
         const data = await this.dataSource.write<Data, IDiaryNote>(
             this.source,
             this.model,
             {
-                data: inputData,
+                data: {
+                    createdDate: DateTime.utc(),
+                    version: 1,
+
+                    ...inputData,
+                },
             }
         );
-
+        console.log(data);
         if (data !== null && Object.keys(data).length > 0) {
             return data;
         }
@@ -63,8 +71,14 @@ export class DiaryNotesModel implements IModel<IDiaryNote> {
         return null;
     }
 
-    async readByField(filter: IFilterOpts): Promise<IDiaryNote | null> {
-        throw new Error("not implemented yet");
+    async readByField(filter: IFilterOpts): Promise<IDiaryNote[] | null> {
+        const value = filter.stringValue || filter.intValue;
+        let queryResult = await this.dataSource.readByField<IDiaryNote>(
+            this.source,
+            filter.field,
+            value
+        );
+        return isArray(queryResult) ? queryResult : [queryResult];
     }
 
     async readMany(take: number, skip: number): Promise<IDiaryNote[] | []> {
@@ -76,5 +90,17 @@ export class DiaryNotesModel implements IModel<IDiaryNote> {
             }
         );
         return data || [];
+    }
+
+    async readByDiaryId(id: string | number) {
+        const data = await this.dataSource.readById<IDiaryNote>(
+            this.source,
+            id
+        );
+
+        if (data !== null && Object.keys(data).length > 0) {
+            return data;
+        }
+        return null;
     }
 }

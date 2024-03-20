@@ -12,6 +12,11 @@ export interface IDataSource {
     write<T, R>(source: string, schema: any, opts: IWriteOpts<T>): Promise<R>;
     read<Filter, R>(source: string, opts: IReadOpts<Filter>): Promise<R[]>;
     readById<R>(source: string, id: string | number): Promise<R>;
+    readByField<R>(
+        source: string,
+        field: string,
+        value: string | number
+    ): Promise<R[] | null>;
     update<T, Query, R>(
         source: string,
         opts: IUpdateOpts<T, Query>

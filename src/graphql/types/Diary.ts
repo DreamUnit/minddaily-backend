@@ -4,5 +4,6 @@ export interface ICreateDiaryRequest {
 }
 
 export interface IUpdateDiaryRequest {
+    userId?: string;
     title?: string;
 }

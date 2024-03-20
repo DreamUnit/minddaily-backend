@@ -1,9 +1,11 @@
 export interface ICreateDiaryNoteRequest {
-    userId: string | number;
     title: string;
+    text: string;
     diaryId: string | number;
 }
 
 export interface IUpdateDiaryNoteRequest {
+    diaryId?: string;
     title?: string;
+    text?: string;
 }
