@@ -13,12 +13,16 @@ export const diaryNotesResolvers = {
             { take, skip }: IPagination
         ): Promise<IReadMany<IDiaryNote>> => {
             try {
-                const data = await diaryNotesModel.readMany(take, skip);
+                const { data, count } = await diaryNotesModel.readMany(
+                    take,
+                    skip
+                );
                 return {
                     code: 200,
                     success: true,
                     message: "Succesfully read Diary Notes",
                     data,
+                    count,
                 };
             } catch (err) {
                 return {
@@ -26,6 +30,7 @@ export const diaryNotesResolvers = {
                     success: false,
                     message: "Failed to read Diary Notes",
                     data: null,
+                    count: null,
                 };
             }
         },

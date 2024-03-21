@@ -3,11 +3,12 @@ import { IDataSource } from "./DataSource";
 import {
     IDeleteOpts,
     IReadOpts,
+    IReadManyAndCountResult,
     IUpdateOpts,
     IWriteOpts,
 } from "./types/DataSource";
 import { ILogger } from "../utils/types/Logger";
-import mongoose, { Model, Document, FilterQuery } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
@@ -54,10 +55,12 @@ export class MongodbDataSource implements IDataSource {
     public async read<Filter, R>(
         source: string,
         opts: IReadOpts<Filter>
-    ): Promise<R[]> {
+    ): Promise<IReadManyAndCountResult<R>> {
         console.log("opts:", opts);
         const model = mongoose.model(source);
         let query = model.find(opts.query);
+        const countQuery = model.find(opts.query).merge(query);
+
         console.log("query:", query);
         if (opts.select) {
             query = query.select(opts.select);
@@ -77,8 +80,10 @@ export class MongodbDataSource implements IDataSource {
             query = query.limit(opts.take);
         }
         const documents = await query.exec();
+        const count = await countQuery.countDocuments().exec();
+
         console.log("documents:", documents);
-        return documents;
+        return { data: documents, count };
     }
 
     public async readById<R>(source: string, id: string | number): Promise<R> {

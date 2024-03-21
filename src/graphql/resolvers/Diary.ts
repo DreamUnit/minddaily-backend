@@ -15,7 +15,8 @@ export const diaryResolvers = {
                     code: 200,
                     success: true,
                     message: "Succesfully read Diaries",
-                    data,
+                    data: data.data,
+                    count: data.count,
                 };
             } catch (err) {
                 return {
@@ -23,6 +24,7 @@ export const diaryResolvers = {
                     success: false,
                     message: "Failed to read Diaries",
                     data: null,
+                    count: 0,
                 };
             }
         },

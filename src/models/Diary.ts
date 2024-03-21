@@ -2,14 +2,17 @@ import { isArray } from "@apollo/client/utilities";
 import { IDataSource } from "../dataSources/DataSource";
 import { IDiary } from "../graphql/mappers/Diary";
 import { DiarySchemaModel } from "../schemas/DiarySchema";
-import { IFilterOpts, IModel } from "./types/Common";
+import { AbstractModel, IFilterOpts } from "./types/Common";
 import { IFilter, ISort } from "./types/Diary";
+import { IReadManyAndCountResult } from "../dataSources/types/DataSource";
 
-export class DiaryModel implements IModel<IDiary> {
+export class DiaryModel extends AbstractModel<IDiary> {
     private readonly source: string = "diaries";
     private readonly model = DiarySchemaModel;
 
-    constructor(private dataSource: IDataSource) {}
+    constructor(private dataSource: IDataSource) {
+        super();
+    }
 
     async create<Data>(inputData: Data): Promise<IDiary> {
         console.log("Create Diary:", inputData);
@@ -73,11 +76,14 @@ export class DiaryModel implements IModel<IDiary> {
         return isArray(queryResult) ? queryResult : [queryResult];
     }
 
-    async readMany(take: number, skip: number): Promise<IDiary[] | []> {
+    async readMany(
+        take: number,
+        skip: number
+    ): Promise<IReadManyAndCountResult<IDiary>> {
         const data = await this.dataSource.read<IFilter, IDiary>(this.source, {
             take: take,
             skip: skip,
         });
-        return data || [];
+        return data;
     }
 }

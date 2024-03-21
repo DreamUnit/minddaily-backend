@@ -8,7 +8,7 @@ export interface IReadMany<T> {
     success: boolean;
     message: string;
     data: T[];
-    // count: number;
+    count: number;
 }
 
 export interface IRead<T> {

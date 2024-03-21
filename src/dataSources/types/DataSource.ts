@@ -11,6 +11,11 @@ export interface IReadOpts<Filter> {
     select?: string[] | { [key: string]: 0 | 1 };
 }
 
+export interface IReadManyAndCountResult<R> {
+    data: R[] | null;
+    count: number;
+}
+
 export interface IWriteOpts<T> {
     data: T;
 }

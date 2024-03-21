@@ -28,6 +28,7 @@ export const userTypeDefs = gql`
             email: String
             points: Int
             locale: String
+            permissions: [String]
         ): ReadUserResponse
         deleteUser(id: ID!): ReadUserResponse
     }
@@ -41,6 +42,7 @@ export const userTypeDefs = gql`
         authUserId: String!
         email: String
         name: String
+        permissions: [String]!
         active: Boolean
         points: Int
         locale: String

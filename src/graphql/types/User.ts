@@ -12,4 +12,5 @@ export interface IUpdateUserRequest {
     locale?: string;
     points?: number;
     active?: boolean;
+    permissions: string[];
 }

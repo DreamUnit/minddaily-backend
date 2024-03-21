@@ -19,6 +19,9 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import { DateTime } from "luxon";
 import { UserSchema } from "./schemas/UserSchema";
 import mongoose from "mongoose";
+import { GoogleStrategy } from "passport-google-oauth20";
+import { IUser } from "./graphql/mappers/User";
+import { passport } from "passport";
 
 dotenv.config();
 
@@ -27,6 +30,7 @@ const mocks = {
 };
 
 interface IContext {
+    user?: IUser;
     token?: string;
     dataSources: {
         mongodbDataSource: MongodbDataSource;
@@ -66,6 +70,32 @@ export const userModel = new UserModel(dataSource);
 export const diaryModel = new DiaryModel(dataSource);
 export const diaryNotesModel = new DiaryNotesModel(dataSource);
 
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            callbackURL: "http://localhost:4000/auth/google/callback",
+        },
+        function (accessToken, refreshToken, profile, cb) {
+            // Here, you would find or create a user in your database
+            // For example, User.findOrCreate({ googleId: profile.id }, function (err, user) {
+            //   return cb(err, user);
+            // });
+            console.log(profile); // Log the profile information to the console
+            cb(null, profile); // Assuming the profile is the user object
+        }
+    )
+);
+
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function (obj, done) {
+    done(null, obj);
+});
+
 async function startServer() {
     await dataSource.connect();
     await server.start();
@@ -78,8 +108,13 @@ async function startServer() {
         express.json(),
         expressMiddleware(server, {
             context: async ({ req }): Promise<IContext> => {
+                // const user: IUser | undefined = user
+                //     ? await userModel.readByField()
+                //     : undefined;
+
                 return {
                     token: req.headers.token as string | undefined,
+                    user,
                     dataSources: {
                         mongodbDataSource: dataSource,
                     },

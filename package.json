@@ -30,6 +30,8 @@
         "graphql-tag": "^2.12.6",
         "luxon": "^3.4.4",
         "mongoose": "^8.2.0",
+        "passport": "^0.7.0",
+        "passport-google-oauth20": "^2.0.0",
         "ts-node-dev": "^2.0.0",
         "winston": "^3.11.0"
     },

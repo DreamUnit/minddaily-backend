@@ -2,15 +2,18 @@ import { isArray } from "@apollo/client/utilities";
 import { UserSchemaModel } from "..";
 import { IDataSource } from "../dataSources/DataSource";
 import { IUser } from "../graphql/mappers/User";
-import { IFilterOpts, IModel } from "./types/Common";
+import { AbstractModel, IFilterOpts } from "./types/Common";
 import { IFilter, ISort } from "./types/Diary";
 import { DateTime } from "luxon";
+import { IReadManyAndCountResult } from "../dataSources/types/DataSource";
 
-export class UserModel implements IModel<IUser> {
+export class UserModel extends AbstractModel<IUser> {
     private readonly source: string = "users";
     private readonly model = UserSchemaModel;
 
-    constructor(private dataSource: IDataSource) {}
+    constructor(private dataSource: IDataSource) {
+        super();
+    }
 
     async create<Data>(inputData: Data): Promise<IUser> {
         const data = await this.dataSource.write<Data, IUser>(
@@ -78,11 +81,14 @@ export class UserModel implements IModel<IUser> {
         return isArray(queryResult) ? queryResult : [queryResult];
     }
 
-    async readMany(take: number, skip: number): Promise<IUser[] | []> {
+    async readMany(
+        take: number,
+        skip: number
+    ): Promise<IReadManyAndCountResult<IUser>> {
         const data = await this.dataSource.read<IFilter, IUser>(this.source, {
             take: take,
             skip: skip,
         });
-        return data || [];
+        return data;
     }
 }

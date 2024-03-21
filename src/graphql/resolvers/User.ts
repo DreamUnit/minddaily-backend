@@ -15,7 +15,8 @@ export const userResolvers = {
                     code: 200,
                     success: true,
                     message: `Succesfully read Users`,
-                    data,
+                    data: data.data,
+                    count: data.count,
                 };
             } catch (err) {
                 return {
@@ -23,6 +24,7 @@ export const userResolvers = {
                     success: false,
                     message: `Failed to read Users with an error of: ${err}`,
                     data: null,
+                    count: null,
                 };
             }
         },
@@ -78,7 +80,7 @@ export const userResolvers = {
 
         updateUser: async (
             _,
-            { id, name, email, active, points, locale }
+            { id, name, email, active, points, locale, permissions }
         ): Promise<IRead<IUser>> => {
             try {
                 const data = await userModel.update<IUpdateUserRequest>(id, {
@@ -87,6 +89,7 @@ export const userResolvers = {
                     active: active,
                     points: points,
                     locale: locale,
+                    permissions: permissions,
                 });
                 return {
                     code: 200,
