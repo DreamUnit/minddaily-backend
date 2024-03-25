@@ -16,6 +16,7 @@ export class UserModel extends AbstractModel<IUser> {
     }
 
     async create<Data>(inputData: Data): Promise<IUser> {
+        console.log("create data:", inputData);
         const data = await this.dataSource.write<Data, IUser>(
             this.source,
             this.model,
@@ -78,6 +79,7 @@ export class UserModel extends AbstractModel<IUser> {
             filter.field,
             value
         );
+        console.log("queryResult:", queryResult);
         return isArray(queryResult) ? queryResult : [queryResult];
     }
 
