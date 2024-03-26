@@ -1,5 +1,5 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel, userModel } from "../..";
+import { diaryModel, logger, userModel } from "../..";
 import { IUser } from "../mappers/User";
 import { ICreateUserRequest, IUpdateUserRequest } from "../types/User";
 
@@ -133,8 +133,7 @@ export const userResolvers = {
                 });
                 return diaries;
             } catch (err) {
-                console.error("Error fetching diaries :", err);
-                throw new Error("Failed to fetch diaries ");
+                logger.error("Error fetching diaries :", err);
             }
         },
     },
