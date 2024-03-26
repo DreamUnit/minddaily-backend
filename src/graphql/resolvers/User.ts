@@ -131,7 +131,6 @@ export const userResolvers = {
                     field: "userId",
                     stringValue: parent.id,
                 });
-                console.log("diaries:", diaries);
                 return diaries;
             } catch (err) {
                 console.error("Error fetching diaries :", err);

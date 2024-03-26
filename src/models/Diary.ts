@@ -15,7 +15,6 @@ export class DiaryModel extends AbstractModel<IDiary> {
     }
 
     async create<Data>(inputData: Data): Promise<IDiary> {
-        console.log("Create Diary:", inputData);
         const data = await this.dataSource.write<Data, IDiary>(
             this.source,
             this.model,
@@ -23,7 +22,6 @@ export class DiaryModel extends AbstractModel<IDiary> {
                 data: inputData,
             }
         );
-        console.log("data Diary:", data);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;

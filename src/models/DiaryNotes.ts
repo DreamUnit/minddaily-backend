@@ -16,7 +16,6 @@ export class DiaryNotesModel extends AbstractModel<IDiaryNote> {
     }
 
     async create<Data>(inputData: Data): Promise<IDiaryNote> {
-        console.log("create dataNote");
         const data = await this.dataSource.write<Data, IDiaryNote>(
             this.source,
             this.model,
@@ -29,7 +28,7 @@ export class DiaryNotesModel extends AbstractModel<IDiaryNote> {
                 },
             }
         );
-        console.log(data);
+
         if (data !== null && Object.keys(data).length > 0) {
             return data;
         }

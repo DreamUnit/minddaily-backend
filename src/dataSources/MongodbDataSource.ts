@@ -56,12 +56,10 @@ export class MongodbDataSource implements IDataSource {
         source: string,
         opts: IReadOpts<Filter>
     ): Promise<IReadManyAndCountResult<R>> {
-        console.log("opts:", opts);
         const model = mongoose.model(source);
         let query = model.find(opts.query);
         const countQuery = model.find(opts.query).merge(query);
 
-        console.log("query:", query);
         if (opts.select) {
             query = query.select(opts.select);
         }
@@ -82,7 +80,6 @@ export class MongodbDataSource implements IDataSource {
         const documents = await query.exec();
         const count = await countQuery.countDocuments().exec();
 
-        console.log("documents:", documents);
         return { data: documents, count };
     }
 
@@ -97,10 +94,8 @@ export class MongodbDataSource implements IDataSource {
         field: string,
         value: string | number
     ): Promise<R[] | null> {
-        console.log("field:", field, "value:", value);
         const model = mongoose.model<R>(source);
         const query = { [field]: value } as mongoose.FilterQuery<R>;
-        console.log("query:", query);
         const document = await model.find(query).exec();
         return document;
     }
@@ -125,7 +120,6 @@ export class MongodbDataSource implements IDataSource {
         await document.save();
 
         const savedDocument = await model.findById(document._id).exec();
-        console.log("Saved doc", savedDocument);
         return savedDocument as R;
     }
 

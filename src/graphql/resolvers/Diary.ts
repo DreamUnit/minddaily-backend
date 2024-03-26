@@ -126,7 +126,6 @@ export const diaryResolvers = {
                     field: "diaryId",
                     stringValue: parent.id,
                 });
-                console.log("diaryNotes:", diaryNotes);
                 return diaryNotes;
             } catch (err) {
                 console.error("Error fetching diary notes:", err);

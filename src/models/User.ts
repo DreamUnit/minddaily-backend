@@ -30,7 +30,7 @@ export class UserModel extends AbstractModel<IUser> {
                 },
             }
         );
-        console.log("model data post save", data);
+
         if (data !== null && Object.keys(data).length > 0) {
             return data;
         }

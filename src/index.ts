@@ -21,7 +21,6 @@ import { UserSchema } from "./schemas/UserSchema";
 import mongoose from "mongoose";
 import { GoogleStrategy } from "passport-google-oauth20";
 import { IUser } from "./graphql/mappers/User";
-import { passport } from "passport";
 
 dotenv.config();
 
