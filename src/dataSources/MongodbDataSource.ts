@@ -102,7 +102,6 @@ export class MongodbDataSource implements IDataSource {
         const query = { [field]: value } as mongoose.FilterQuery<R>;
         console.log("query:", query);
         const document = await model.find(query).exec();
-        console.log("document", document);
         return document;
     }
 
