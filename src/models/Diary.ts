@@ -1,13 +1,61 @@
+import { isArray } from "@apollo/client/utilities";
 import { IDataSource } from "../dataSources/DataSource";
 import { IDiary } from "../graphql/mappers/Diary";
-import { IFilterOpts, IModel } from "./types/Common";
+import { DiarySchemaModel } from "../schemas/DiarySchema";
+import { AbstractModel, IFilterOpts } from "./types/Common";
 import { IFilter, ISort } from "./types/Diary";
+import { IReadManyAndCountResult } from "../dataSources/types/DataSource";
 
-export class DiaryModel implements IModel<IDiary> {
+export class DiaryModel extends AbstractModel<IDiary> {
     private readonly source: string = "diaries";
-    constructor(private dataSource: IDataSource) {}
+    private readonly model = DiarySchemaModel;
 
-    async fetchById(id: string): Promise<IDiary | null> {
+    constructor(private dataSource: IDataSource) {
+        super();
+    }
+
+    async create<Data>(inputData: Data): Promise<IDiary> {
+        const data = await this.dataSource.write<Data, IDiary>(
+            this.source,
+            this.model,
+            {
+                data: inputData,
+            }
+        );
+
+        if (data !== null && Object.keys(data).length > 0) {
+            return data;
+        }
+        return null;
+    }
+
+    async update<Data>(
+        id: string | number,
+        updatedData: Data
+    ): Promise<IDiary> {
+        const updatedDataResponse = await this.dataSource.update<
+            Data,
+            {},
+            IDiary
+        >(this.source, {
+            id: id,
+            data: updatedData,
+        });
+        return updatedDataResponse;
+    }
+
+    async delete(id: string | number): Promise<boolean> {
+        const deleteResponse = await this.dataSource.deleteById(
+            this.source,
+            this.model,
+            {
+                id: id,
+            }
+        );
+        return deleteResponse;
+    }
+
+    async readById(id: string): Promise<IDiary | null> {
         const data = await this.dataSource.readById<IDiary>(this.source, id);
 
         if (data !== null && Object.keys(data).length > 0) {
@@ -16,19 +64,24 @@ export class DiaryModel implements IModel<IDiary> {
         return null;
     }
 
-    async fetchByField(filter: IFilterOpts): Promise<IDiary | null> {
-        // Implementation to fetch diaries by a field using dataSource
-        throw new Error("not implemented yet");
+    async readByField(filter: IFilterOpts): Promise<IDiary[] | null> {
+        const value = filter.stringValue || filter.intValue;
+        let queryResult = await this.dataSource.readByField<IDiary>(
+            this.source,
+            filter.field,
+            value
+        );
+        return isArray(queryResult) ? queryResult : [queryResult];
     }
 
-    async fetchMany(take: number, skip: number): Promise<IDiary[] | []> {
-        const data = await this.dataSource.read<IFilter, ISort, IDiary>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
-        return data || [];
+    async readMany(
+        take: number,
+        skip: number
+    ): Promise<IReadManyAndCountResult<IDiary>> {
+        const data = await this.dataSource.read<IFilter, IDiary>(this.source, {
+            take: take,
+            skip: skip,
+        });
+        return data;
     }
 }

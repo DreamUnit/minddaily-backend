@@ -11,8 +11,9 @@ COPY .env .
 COPY src /src
 
 # Install server dependencies
-RUN  npm install
+RUN npm install
 RUN npm run build
+
 
 # Copy the server files into the container
 COPY src ./src
