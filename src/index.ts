@@ -19,10 +19,15 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import { DateTime } from "luxon";
 import { UserSchema } from "./schemas/UserSchema";
 import mongoose from "mongoose";
-import { GoogleStrategy } from "passport-google-oauth20";
 import { IUser } from "./graphql/mappers/User";
+import passport from "passport";
+import GoogleStrategy from "passport-google-oauth20";
+import path from "path";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import jwt from "jsonwebtoken";
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const mocks = {
     DateTime: () => DateTime.now().toISO(),
@@ -58,6 +63,9 @@ const server =
           });
 
 // need a better way of instantiating classes in the future.
+////////////////////////
+// Class Instantiatiion
+////////////////////////
 export const logger: ILogger = new Logger(new WinstonLogger());
 export const dataSource = new MongodbDataSource(
     process.env.MONGODB_DSN,
@@ -65,55 +73,103 @@ export const dataSource = new MongodbDataSource(
 );
 export const UserSchemaModel = mongoose.model("users", UserSchema);
 export const userModel = new UserModel(dataSource);
-
 export const diaryModel = new DiaryModel(dataSource);
 export const diaryNotesModel = new DiaryNotesModel(dataSource);
+////////////////////////
+app.use(express.json());
+app.use(
+    cors<cors.CorsRequest>({
+        origin: ["*"],
+    })
+);
+app.use(
+    session({
+        secret: "yourSecretKey",
+        resave: false,
+        saveUninitialized: true,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_DSN,
+        }),
+        cookie: {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        }, // 1 day
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-// passport.use(
-//     new GoogleStrategy(
-//         {
-//             clientID: process.env.GOOGLE_CLIENT_ID,
-//             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//             callbackURL: "http://localhost:4000/auth/google/callback",
-//         },
-//         function (accessToken, refreshToken, profile, cb) {
-//             // Here, you would find or create a user in your database
-//             // For example, User.findOrCreate({ googleId: profile.id }, function (err, user) {
-//             //   return cb(err, user);
-//             // });
-//             console.log(profile); // Log the profile information to the console
-//             cb(null, profile); // Assuming the profile is the user object
-//         }
-//     )
-// );
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
+            callbackURL: process.env.CALL_BACK_URL,
+        },
+        async function (_, __, profile, cb) {
+            const existingUser = await userModel.readByField({
+                field: "authUserId",
+                stringValue: profile.id,
+            });
+            if (existingUser[0] == null) {
+                const newUser = userModel.create({
+                    authUserId: profile.id,
+                    name: `${profile.name.givenName} ${profile.name.familyName}`,
+                    email: profile.emails[0].value,
+                    locale: profile._json.locale,
+                });
+                return cb(null, newUser);
+            }
+            return cb(null, existingUser);
+        }
+    )
+);
+app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-// passport.serializeUser(function (user, done) {
-//     done(null, user);
-// });
+app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", {
+        failureRedirect: "/login",
+        failureMessage: true,
+    }),
+    function (req, res) {
+        const user = req.user as IUser;
+        console.log("a user id:");
+        const token = jwt.sign(
+            { id: user.authUserId },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d",
+            }
+        );
+        res.send(token);
+    }
+);
 
-// passport.deserializeUser(function (obj, done) {
-//     done(null, obj);
-// });
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+    done(null, user);
+});
 
 async function startServer() {
     await dataSource.connect();
-    await server.start();
 
+    await server.start();
     app.use(
         "/",
-        cors<cors.CorsRequest>({
-            origin: ["*"],
-        }),
-        express.json(),
         expressMiddleware(server, {
             context: async ({ req }): Promise<IContext> => {
-                // const user: IUser | undefined = user
-                //     ? await userModel.readByField()
-                //     : undefined;
-
+                console.log("req middleware:", req.session.passport.user);
+                const user = req.session?.passport.user?.id;
                 return {
-                    token: req.headers.token as string | undefined,
-                    // user,
+                    user,
                     dataSources: {
                         mongodbDataSource: dataSource,
                     },
@@ -127,5 +183,4 @@ async function startServer() {
     );
     console.log(`🚀 Server ready at http://localhost:8082/`);
 }
-
 startServer();
