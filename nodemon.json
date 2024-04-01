@@ -1,5 +1,5 @@
 {
-    "watch": ["src"],
+    "watch": ["src", "codegen.ts", "package.json"],
     "ext": "ts,json",
     "ignore": ["src/**/*.spec.ts", "node_modules"],
     "exec": "npm run build && node ./dist/index.js",

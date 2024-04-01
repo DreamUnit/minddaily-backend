@@ -1,5 +1,4 @@
-import { isArray } from "@apollo/client/utilities";
-import { UserSchemaModel } from "..";
+import { UsersSchemaModel } from "../schemas/UserSchema";
 import { IDataSource } from "../dataSources/DataSource";
 import { IUser } from "../graphql/mappers/User";
 import { AbstractModel, IFilterOpts } from "./types/Common";
@@ -9,7 +8,7 @@ import { IReadManyAndCountResult } from "../dataSources/types/DataSource";
 
 export class UserModel extends AbstractModel<IUser> {
     private readonly source: string = "users";
-    private readonly model = UserSchemaModel;
+    private readonly model = UsersSchemaModel;
 
     constructor(private dataSource: IDataSource) {
         super();
@@ -78,7 +77,7 @@ export class UserModel extends AbstractModel<IUser> {
             filter.field,
             value
         );
-        return isArray(queryResult) ? queryResult : [queryResult];
+        return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
     async readMany(

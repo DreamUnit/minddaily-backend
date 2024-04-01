@@ -20,10 +20,16 @@ Install dependencies
 npm install
 ```
 
-Change .env.example to .env
+Change .env.example to development.env
 
 ```
-mv .env.example .env
+cp .env.example development.env
+```
+
+OPTIONAL FOR PRODUCTION: Change .env.example to production.env
+
+```
+cp .env.example production.env
 ```
 
 build the docker image
@@ -32,10 +38,10 @@ build the docker image
 docker compose build
 ```
 
-compose the docker image, starting the mongodb container and server container
+compose the docker image, starting the mongodb container and server container if in development.
 
 ```
-docker compose up -d
+docker-compose up -d
 ```
 
 If all is successful, you should see something like:

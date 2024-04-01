@@ -1,6 +1,7 @@
 node_modules
 dist
-.env
+development.env
+production.env
 combined.log
 __generated__
 data
