@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+    server:
+        build:
+            context: ../../
+            dockerfile: ./docker/production/Dockerfile
+        ports:
+            - "8082:8082"
+        env_file:
+            - ../../production.env
+        environment:
+            - NODE_ENV=production
