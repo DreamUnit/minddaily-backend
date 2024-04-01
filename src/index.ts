@@ -13,14 +13,14 @@ import { MongodbDataSource } from "./dataSources/MongodbDataSource";
 import { DiaryModel } from "./models/Diary";
 import { UserModel } from "./models/User";
 import { DiaryNotesModel } from "./models/DiaryNotes";
-import { IUser } from "./graphql/mappers/User";
 import passport from "passport";
-import GoogleStrategy from "passport-google-oauth20";
 import path from "path";
 import session from "express-session";
-import MongoStore from "connect-mongo";
-import authRoutes from "./express/AuthRoutes";
+import routes from "./routes/index";
 import { startServer } from "./server";
+import { DataSourceContext } from "./context";
+import googleStrategy from "./auth/passport";
+import sessionConfig from "./auth/session";
 
 dotenv.config({
     path: path.resolve(
@@ -31,30 +31,15 @@ dotenv.config({
     ),
 });
 
-export interface IContext {
-    user?: IUser;
-    token?: string;
-    dataSources: {
-        mongodbDataSource: MongodbDataSource;
-    };
-}
-
 export const app = express();
 export const httpServer = http.createServer(app);
 
-export const server =
-    process.env.NODE_ENV === "production"
-        ? new ApolloServer<IContext>({
-              typeDefs,
-              resolvers,
-              plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-          })
-        : new ApolloServer<IContext>({
-              typeDefs,
-              resolvers,
-              plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-              introspection: true,
-          });
+export const server = new ApolloServer<DataSourceContext>({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: process.env.NODE_ENV === "development",
+});
 
 // need a better way of instantiating classes in the future.
 ////////////////////////
@@ -75,55 +60,16 @@ export const diaryNotesModel = new DiaryNotesModel(dataSource);
 app.use(express.json());
 app.use(
     cors<cors.CorsRequest>({
-        origin: ["*"],
+        origin: process.env.CORS_DOMAINS.split(","),
     })
 );
-app.use(
-    session({
-        secret: "yourSecretKey",
-        resave: false,
-        saveUninitialized: true,
-        store: MongoStore.create({
-            mongoUrl: process.env.MONGODB_DSN,
-        }),
-        cookie: {
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-        }, // 1 day
-    })
-);
+app.use(session(sessionConfig));
 
-// Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(authRoutes);
+app.use(routes.publicRouter);
 
-passport.use(
-    new GoogleStrategy(
-        {
-            clientID: process.env.CLIENT_ID,
-            clientSecret: process.env.CLIENT_SECRET,
-            callbackURL: process.env.CALL_BACK_URL,
-        },
-        async function (_, __, profile, cb) {
-            const existingUser = await userModel.readByField({
-                field: "authUserId",
-                stringValue: profile.id,
-            });
-            if (existingUser[0] == null) {
-                const newUser = userModel.create({
-                    authUserId: profile.id,
-                    name: `${profile.name.givenName} ${profile.name.familyName}`,
-                    email: profile.emails[0].value,
-                    locale: profile._json.locale,
-                });
-                return cb(null, newUser);
-            }
-            return cb(null, existingUser);
-        }
-    )
-);
+passport.use(googleStrategy);
 
 passport.serializeUser(function (user, done) {
     done(null, user);
@@ -132,5 +78,5 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (user, done) {
     done(null, user);
 });
-///////////////////////////
+
 startServer();

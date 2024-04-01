@@ -1,16 +1,16 @@
-import { IContext, app, dataSource, httpServer, server } from ".";
-import { authenticateToken } from "./middleware/authenticateToken";
+import express from "express";
+import { app, dataSource, httpServer, logger, server } from ".";
+import { DataSourceContext } from "./context";
 import { expressMiddleware } from "@apollo/server/express4";
+import routes from "./routes/index";
 
 export async function startServer() {
     await dataSource.connect();
-
     await server.start();
     app.use(
-        "/",
-        authenticateToken,
+        routes.protectedRouter,
         expressMiddleware(server, {
-            context: async ({ req }): Promise<IContext> => {
+            context: async ({ req }): Promise<DataSourceContext> => {
                 const user = req.session?.passport?.user
                     ? req.session.passport.user.id
                     : undefined;
@@ -25,8 +25,8 @@ export async function startServer() {
     );
 
     await new Promise<void>(resolve =>
-        httpServer.listen({ port: 8082 }, resolve)
+        httpServer.listen({ port: process.env.SERVER_PORT }, resolve)
     );
 
-    console.log(`🚀 Server ready at http://localhost:8082/`);
+    logger.info(`🚀 Server ready at ${process.env.SCHEMA_PORT}`);
 }

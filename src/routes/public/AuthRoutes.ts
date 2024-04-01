@@ -1,16 +1,16 @@
-// src/routes/authRoutes.ts
 import express from "express";
-const router = express.Router();
 import passport from "passport";
-import { IUser } from "../graphql/mappers/User";
+import { IUser } from "../../graphql/mappers/User";
 import jwt from "jsonwebtoken";
 
-router.get(
+const publicRouter = express.Router();
+
+publicRouter.get(
     "/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-router.get(
+publicRouter.get(
     "/auth/google/callback",
     passport.authenticate("google", {
         failureRedirect: "/login",
@@ -30,4 +30,4 @@ router.get(
     }
 );
 
-export default router;
+export default publicRouter;
