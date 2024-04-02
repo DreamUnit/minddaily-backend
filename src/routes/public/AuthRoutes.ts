@@ -3,14 +3,14 @@ import passport from "passport";
 import { IUser } from "../../graphql/mappers/User";
 import jwt from "jsonwebtoken";
 
-const publicRouter = express.Router();
+const router = express.Router();
 
-publicRouter.get(
+router.get(
     "/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-publicRouter.get(
+router.get(
     "/auth/google/callback",
     passport.authenticate("google", {
         failureRedirect: "/login",
@@ -30,4 +30,4 @@ publicRouter.get(
     }
 );
 
-export default publicRouter;
+export default router;

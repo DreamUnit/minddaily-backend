@@ -1,8 +1,8 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/authenticateToken";
 
-const protectedRouter = express.Router();
+const router = express.Router();
 
-protectedRouter.post("/", authenticateToken);
+router.post("/", authenticateToken);
 
-export default protectedRouter;
+export default router;
