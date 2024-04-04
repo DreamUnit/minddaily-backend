@@ -39,4 +39,4 @@ jobs:
                   script: |
                       docker pull joshibbotson/production-server:latest
                       docker stop server || true
-                      docker run -d -p 8082:8082 --env-file=./production.env --name server joshibbotson/production-server:latest
+                      docker run -d -p 8082:8082 --env-file=/home/ubuntu/repos/production.env  --name server joshibbotson/production-server:latest
