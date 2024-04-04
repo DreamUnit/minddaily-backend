@@ -24,10 +24,10 @@ jobs:
             - name: Build and Push Docker image
               uses: docker/build-push-action@v2
               with:
-                  context: ./docker/production
+                  context: .
                   file: ./docker/production/Dockerfile
                   push: true
-                  tags: yourusername/production-server:latest
+                  tags: minddaily-backend/production-server:latest
                   platforms: linux/amd64,linux/arm64
 
             - name: Deploy to AWS EC2
@@ -37,6 +37,6 @@ jobs:
                   username: ${{ secrets.USERNAME }}
                   key: ${{ secrets.SSHKEY }}
                   script: |
-                      docker pull yourusername/production-server:latest
+                      docker pull minddaily-backend/production-server:latest
                       docker stop server || true
-                      docker run -d -p 8082:8082 --env-file=./production.env --name server yourusername/production-server:latest
+                      docker run -d -p 8082:8082 --env-file=./production.env --name server minddaily-backend/production-server:latest
