@@ -35,7 +35,7 @@ cp .env.example production.env
 build the docker image
 
 ```
-docker compose build
+cd docker/development && docker compose build
 ```
 
 compose the docker image, starting the mongodb container and server container if in development.
