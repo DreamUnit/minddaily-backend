@@ -27,7 +27,7 @@ jobs:
                   context: .
                   file: ./docker/production/Dockerfile
                   push: true
-                  tags: minddaily-backend/production-server:latest
+                  tags: joshibbotson/production-server:latest
                   platforms: linux/amd64,linux/arm64
 
             - name: Deploy to AWS EC2
@@ -37,6 +37,6 @@ jobs:
                   username: ${{ secrets.USERNAME }}
                   key: ${{ secrets.SSHKEY }}
                   script: |
-                      docker pull minddaily-backend/production-server:latest
+                      docker pull joshibbotson/production-server:latest
                       docker stop server || true
-                      docker run -d -p 8082:8082 --env-file=./production.env --name server minddaily-backend/production-server:latest
+                      docker run -d -p 8082:8082 --env-file=./production.env --name server joshibbotson/production-server:latest
