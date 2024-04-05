@@ -1,5 +1,5 @@
 import GoogleStrategy from "passport-google-oauth20";
-import { userModel } from "..";
+import { userModel } from "../config/dataServices";
 
 const googleStrategy = new GoogleStrategy(
     {
