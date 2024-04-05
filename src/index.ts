@@ -1,5 +1,4 @@
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import express from "express";
 import http from "http";
@@ -14,118 +13,70 @@ import { MongodbDataSource } from "./dataSources/MongodbDataSource";
 import { DiaryModel } from "./models/Diary";
 import { UserModel } from "./models/User";
 import { DiaryNotesModel } from "./models/DiaryNotes";
-import { addMocksToSchema } from "@graphql-tools/mock";
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { DateTime } from "luxon";
-import { UserSchema } from "./schemas/UserSchema";
-import mongoose from "mongoose";
-import { GoogleStrategy } from "passport-google-oauth20";
-import { IUser } from "./graphql/mappers/User";
+import passport from "passport";
+import path from "path";
+import session from "express-session";
+import routes from "./routes/index";
+import { startServer } from "./server";
+import { DataSourceContext } from "./context";
+import googleStrategy from "./auth/passport";
+import sessionConfig from "./auth/session";
 
-dotenv.config();
+dotenv.config({
+    path: path.resolve(
+        __dirname,
+        process.env.NODE_ENV === "production"
+            ? "../production.env"
+            : "../development.env"
+    ),
+});
 
-const mocks = {
-    DateTime: () => DateTime.now().toISO(),
-};
+export const app = express();
+export const httpServer = http.createServer(app);
 
-interface IContext {
-    user?: IUser;
-    token?: string;
-    dataSources: {
-        mongodbDataSource: MongodbDataSource;
-    };
-}
-
-const app = express();
-const httpServer = http.createServer(app);
-
-const server =
-    process.env.NODE_ENV === "production"
-        ? new ApolloServer<IContext>({
-              typeDefs,
-              resolvers,
-              plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-          })
-        : new ApolloServer<IContext>({
-              // schema: addMocksToSchema({
-              //     schema: makeExecutableSchema({ typeDefs, resolvers }),
-              //     mocks,
-              // }),
-              typeDefs,
-              resolvers,
-              plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-              introspection: true,
-          });
+export const server = new ApolloServer<DataSourceContext>({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: process.env.NODE_ENV === "development",
+});
 
 // need a better way of instantiating classes in the future.
+////////////////////////
+// Class Instantiatiion
+////////////////////////
 export const logger: ILogger = new Logger(new WinstonLogger());
 export const dataSource = new MongodbDataSource(
     process.env.MONGODB_DSN,
     logger
 );
-export const UserSchemaModel = mongoose.model("users", UserSchema);
 export const userModel = new UserModel(dataSource);
-
 export const diaryModel = new DiaryModel(dataSource);
 export const diaryNotesModel = new DiaryNotesModel(dataSource);
+////////////////////////
+////////////////////////
+////////////////////////
 
-// passport.use(
-//     new GoogleStrategy(
-//         {
-//             clientID: process.env.GOOGLE_CLIENT_ID,
-//             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//             callbackURL: "http://localhost:4000/auth/google/callback",
-//         },
-//         function (accessToken, refreshToken, profile, cb) {
-//             // Here, you would find or create a user in your database
-//             // For example, User.findOrCreate({ googleId: profile.id }, function (err, user) {
-//             //   return cb(err, user);
-//             // });
-//             console.log(profile); // Log the profile information to the console
-//             cb(null, profile); // Assuming the profile is the user object
-//         }
-//     )
-// );
+app.use(express.json());
+app.use(
+    cors<cors.CorsRequest>({
+        origin: process.env.CORS_DOMAINS.split(","),
+    })
+);
+app.use(session(sessionConfig));
 
-// passport.serializeUser(function (user, done) {
-//     done(null, user);
-// });
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(routes.publicRouter);
 
-// passport.deserializeUser(function (obj, done) {
-//     done(null, obj);
-// });
+passport.use(googleStrategy);
 
-async function startServer() {
-    await dataSource.connect();
-    await server.start();
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
 
-    app.use(
-        "/",
-        cors<cors.CorsRequest>({
-            origin: ["*"],
-        }),
-        express.json(),
-        expressMiddleware(server, {
-            context: async ({ req }): Promise<IContext> => {
-                // const user: IUser | undefined = user
-                //     ? await userModel.readByField()
-                //     : undefined;
-
-                return {
-                    token: req.headers.token as string | undefined,
-                    // user,
-                    dataSources: {
-                        mongodbDataSource: dataSource,
-                    },
-                };
-            },
-        })
-    );
-
-    await new Promise<void>(resolve =>
-        httpServer.listen({ port: 8082 }, resolve)
-    );
-    console.log(`🚀 Server ready at http://localhost:8082/`);
-}
+passport.deserializeUser(function (user, done) {
+    done(null, user);
+});
 
 startServer();

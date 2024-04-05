@@ -4,10 +4,7 @@ import { ILogger } from "../types/Logger";
 export class WinstonLogger implements ILogger {
     private winstonLogger: winston.Logger = winston.createLogger({
         format: winston.format.cli(),
-        transports: [
-            new winston.transports.Console(),
-            new winston.transports.File({ filename: "combined.log" }),
-        ],
+        transports: [new winston.transports.Console()],
     });
 
     public info(message: string, meta: Record<string, any> = {}): void {

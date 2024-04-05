@@ -1,4 +1,3 @@
-import { isArray } from "@apollo/client/utilities";
 import { IDataSource } from "../dataSources/DataSource";
 import { IDiary } from "../graphql/mappers/Diary";
 import { DiarySchemaModel } from "../schemas/DiarySchema";
@@ -71,7 +70,7 @@ export class DiaryModel extends AbstractModel<IDiary> {
             filter.field,
             value
         );
-        return isArray(queryResult) ? queryResult : [queryResult];
+        return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
     async readMany(
