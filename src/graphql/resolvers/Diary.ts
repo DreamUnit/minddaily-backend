@@ -1,8 +1,9 @@
 import { IDiary } from "../mappers/Diary";
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel, diaryNotesModel, logger } from "../..";
+
 import { DateTime } from "luxon";
 import { IUpdateDiaryRequest } from "../types/Diary";
+import { diaryModel, diaryNotesModel, logger } from "../../config/dataServices";
 export const diaryResolvers = {
     Query: {
         readDiaries: async (

@@ -61,3 +61,10 @@ Optional: run test suite
 ```
 npm test
 ```
+
+Optional: seed database with faux data.
+Run from: minddaily-backend/
+
+```
+docker exec -it development-server-1 npm run seed
+```

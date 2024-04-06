@@ -1,10 +1,11 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryNotesModel } from "../..";
+
 import { IDiaryNote } from "../mappers/DiaryNotes";
 import {
     ICreateDiaryNoteRequest,
     IUpdateDiaryNoteRequest,
 } from "../types/DiaryNote";
+import { diaryNotesModel } from "../../config/dataServices";
 
 export const diaryNotesResolvers = {
     Query: {

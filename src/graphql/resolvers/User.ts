@@ -1,7 +1,8 @@
 import { IDelete, IPagination, IRead, IReadMany } from "../types/common";
-import { diaryModel, logger, userModel } from "../..";
+
 import { IUser } from "../mappers/User";
 import { ICreateUserRequest, IUpdateUserRequest } from "../types/User";
+import { userModel, diaryModel, logger } from "../../config/dataServices";
 
 export const userResolvers = {
     Query: {
