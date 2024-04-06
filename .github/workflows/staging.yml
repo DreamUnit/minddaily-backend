@@ -1,0 +1,66 @@
+name: Build, Deploy, and Teardown AWS EC2 Staging
+
+on:
+   push:
+        branches:
+            - main
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Build docker image and push to dockerhub
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v2
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v1
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build and Push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  file: ./docker/staging/Dockerfile
+                  push: true
+                  tags: joshibbotson/staging-server:latest
+                  platforms: linux/amd64,linux/arm64
+    
+    deploy:
+      needs: build
+      name: Deploy to AWS EC2 Staging
+      runs-on: ubuntu-latest
+      steps:
+          -name: pull and run container
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker pull joshibbotson/staging-server:latest
+                      docker stop staging-server || true
+                      docker rm staging-server
+                      docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
+
+    teardown-staging:
+        if: ${{ github.event.inputs.action == 'teardown' }}
+        runs-on: ubuntu-latest
+        name: Teardown AWS EC2 Staging Environment
+        steps:
+          - name: Teardown Staging Server
+            uses: appleboy/ssh-action@master
+            with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USERNAME }}
+                key: ${{ secrets.SSHKEY }}
+                script: |
+                    docker stop staging-server || true
+                    docker rm staging-server
+                    docker rmi joshibbotson/staging-server:latest
+                    docker system prune -af
+                    

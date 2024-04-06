@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+    server:
+        build:
+            context: ../../
+            dockerfile: ./docker/staging/Dockerfile
+        ports:
+            - "8083:8083"
+        env_file:
+            - ../../staging.env
+        environment:
+            - NODE_ENV=development
+        depends_on:
+            - mongodb
+        volumes:
+            - ../../src:/server/src
+            - /server/node_modules
+    mongodb:
+        image: mongo:latest
+        ports:
+            - "27017:27017"
+        volumes:
+            - ../data/mongodb:/data/db
+volumes:
+    mongodb-data:
