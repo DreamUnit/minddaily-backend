@@ -5,8 +5,8 @@ on:
 
 jobs:
     build:
-        runs-on: ubuntu-latest
         name: Build docker image and push to dockerhub
+        runs-on: ubuntu-latest
 
         steps:
             - name: Checkout Repo
@@ -31,17 +31,18 @@ jobs:
                   platforms: linux/amd64,linux/arm64
 
     deploy:
-          needs: build
-          name: Deploy to AWS EC2 Production
-          runs-on: ubuntu-latest
-                - name: Deploy to AWS EC2
-                  uses: appleboy/ssh-action@master
-                  with:
-                      host: ${{ secrets.HOST }}
-                      username: ${{ secrets.USERNAME }}
-                      key: ${{ secrets.SSHKEY }}
-                      script: |
-                          docker pull joshibbotson/production-server:latest
-                          docker stop production-server || true
-                          docker rm production-server
-                          docker run -d -p 8082:8082 --env-file=/home/ubuntu/repos/production.env  --name production-server joshibbotson/production-server:latest
+        needs: build
+        name: Deploy to AWS EC2 Production
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to AWS EC2
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker pull joshibbotson/production-server:latest
+                      docker stop production-server || true
+                      docker rm production-server
+                      docker run -d -p 8082:8082 --env-file=/home/ubuntu/repos/production.env  --name production-server joshibbotson/production-server:latest

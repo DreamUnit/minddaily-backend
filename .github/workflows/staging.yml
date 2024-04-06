@@ -4,6 +4,12 @@ on:
     push:
         branches:
             - main
+    workflow_dispatch:
+        inputs:
+            runTeardown:
+                description: "Run teardown job (yes/no)"
+                required: true
+                default: "no"
 
 jobs:
     build:
@@ -96,7 +102,7 @@ jobs:
     #                   docker exec staging-server npm run codegen
 
     teardown-staging:
-        if: ${{ github.event.inputs.action == 'teardown' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
         runs-on: ubuntu-latest
         steps:
             - name: Teardown Staging Server
