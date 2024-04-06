@@ -36,31 +36,31 @@ jobs:
       runs-on: ubuntu-latest
       steps:
           -name: pull and run container
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.SSHKEY }}
-                  script: |
-                      docker pull joshibbotson/staging-server:latest
-                      docker stop staging-server || true
-                      docker rm staging-server
-                      docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.HOST }}
+                    username: ${{ secrets.USERNAME }}
+                    key: ${{ secrets.SSHKEY }}
+                    script: |
+                        docker pull joshibbotson/staging-server:latest
+                        docker stop staging-server || true
+                        docker rm staging-server
+                        docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
 
     teardown-staging:
         if: ${{ github.event.inputs.action == 'teardown' }}
         runs-on: ubuntu-latest
         name: Teardown AWS EC2 Staging Environment
         steps:
-          - name: Teardown Staging Server
-            uses: appleboy/ssh-action@master
-            with:
-                host: ${{ secrets.HOST }}
-                username: ${{ secrets.USERNAME }}
-                key: ${{ secrets.SSHKEY }}
-                script: |
-                    docker stop staging-server || true
-                    docker rm staging-server
-                    docker rmi joshibbotson/staging-server:latest
-                    docker system prune -af
+            - name: Teardown Staging Server
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker stop staging-server || true
+                      docker rm staging-server
+                      docker rmi joshibbotson/staging-server:latest
+                      docker system prune -af
                     
