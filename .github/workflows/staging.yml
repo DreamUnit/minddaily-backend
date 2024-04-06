@@ -46,53 +46,54 @@ jobs:
                       docker stop staging-server || true
                       docker rm staging-server
                       docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
-    codegen:
-        needs: deploy
-        runs-on: ubuntu-latest
-        steps:
-            - name: Wait for Server to be Ready
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.SSHKEY }}
-                  script: |
-                      # Define the endpoint to check, adjust the URL as needed
-                      URL="http://localhost:8083/health"
+    # May be worth getting this working at some point.
+    # codegen:
+    #     needs: deploy
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - name: Wait for Server to be Ready
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: ${{ secrets.HOST }}
+    #               username: ${{ secrets.USERNAME }}
+    #               key: ${{ secrets.SSHKEY }}
+    #               script: |
+    #                   # Define the endpoint to check, adjust the URL as needed
+    #                   URL="http://localhost:8083/health"
 
-                      # Maximum number of attempts to check if the server is up
-                      MAX_ATTEMPTS=30
+    #                   # Maximum number of attempts to check if the server is up
+    #                   MAX_ATTEMPTS=30
 
-                      # Delay (in seconds) between attempts
-                      DELAY_SECONDS=10
+    #                   # Delay (in seconds) between attempts
+    #                   DELAY_SECONDS=10
 
-                      echo "Checking if server is up..."
+    #                   echo "Checking if server is up..."
 
-                      for (( attempt=1; attempt<=MAX_ATTEMPTS; attempt++ ))
-                      do
-                        # Use curl to send a GET request to the server
-                        if curl --output /dev/null --silent --head --fail "$URL"; then
-                          echo "Server is up and running!"
-                          break
-                        else
-                          echo "Attempt $attempt of $MAX_ATTEMPTS failed. Retrying in $DELAY_SECONDS seconds..."
-                          sleep $DELAY_SECONDS
-                        fi
-                        
-                        # If this was the last attempt, exit with an error
-                        if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
-                          echo "Server did not become ready in time."
-                          exit 1
-                        fi
-                      done
-            - name: Run npm run codegen within Container
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.SSHKEY }}
-                  script: |
-                      docker exec staging-server npm run codegen
+    #                   for (( attempt=1; attempt<=MAX_ATTEMPTS; attempt++ ))
+    #                   do
+    #                     # Use curl to send a GET request to the server
+    #                     if curl --output /dev/null --silent --head --fail "$URL"; then
+    #                       echo "Server is up and running!"
+    #                       break
+    #                     else
+    #                       echo "Attempt $attempt of $MAX_ATTEMPTS failed. Retrying in $DELAY_SECONDS seconds..."
+    #                       sleep $DELAY_SECONDS
+    #                     fi
+
+    #                     # If this was the last attempt, exit with an error
+    #                     if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
+    #                       echo "Server did not become ready in time."
+    #                       exit 1
+    #                     fi
+    #                   done
+    #         - name: Run npm run codegen within Container
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: ${{ secrets.HOST }}
+    #               username: ${{ secrets.USERNAME }}
+    #               key: ${{ secrets.SSHKEY }}
+    #               script: |
+    #                   docker exec staging-server npm run codegen
 
     teardown-staging:
         if: ${{ github.event.inputs.action == 'teardown' }}
