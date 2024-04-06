@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-    server:
+    server-staging:
         build:
             context: ../../
             dockerfile: ./docker/staging/Dockerfile
@@ -11,15 +11,25 @@ services:
         environment:
             - NODE_ENV=development
         depends_on:
-            - mongodb
+            - mongodb-staging
         volumes:
             - ../../src:/server/src
             - /server/node_modules
-    mongodb:
+        networks:
+            - staging_network
+
+    mongodb-staging:
         image: mongo:latest
         ports:
-            - "27017:27017"
+            - "27018:27017"
         volumes:
-            - ../data/mongodb:/data/db
+            - mongodb_staging_data:/data/db
+        networks:
+            - staging_network
+
+networks:
+    staging_network:
+        driver: bridge
+
 volumes:
-    mongodb-data:
+    mongodb_staging_data:
