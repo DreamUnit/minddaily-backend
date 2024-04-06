@@ -85,14 +85,14 @@ jobs:
                           exit 1
                         fi
                       done
-                    - name: Run npm run codegen within Container
-                      uses: appleboy/ssh-action@master
-                      with:
-                        host: ${{ secrets.HOST }}
-                        username: ${{ secrets.USERNAME }}
-                        key: ${{ secrets.SSHKEY }}
-                        script: |
-                          docker exec staging-server npm run codegen
+            - name: Run npm run codegen within Container
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker exec staging-server npm run codegen
 
     teardown-staging:
         if: ${{ github.event.inputs.action == 'teardown' }}
