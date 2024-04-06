@@ -16,7 +16,6 @@ dotenv.config({
             : "../../development.env"
     ),
 });
-console.log(process.env.MONGODB_DSN);
 // Logger instantiation
 export const logger: ILogger = new Logger(new WinstonLogger());
 
