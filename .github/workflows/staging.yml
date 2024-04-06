@@ -1,9 +1,6 @@
 name: Build, Deploy, and Teardown AWS EC2 Staging
 
 on:
-    push:
-        branches:
-            - main
     workflow_dispatch:
         inputs:
             runTeardown:
