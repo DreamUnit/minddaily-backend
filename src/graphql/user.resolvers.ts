@@ -1,6 +1,6 @@
 import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
 
-import { IUser } from "./user.mapper";
+import { IUser } from "./user.types";
 import { ICreateUserRequest, IUpdateUserRequest } from "./user.types";
 import { userModel, diaryModel, logger } from "../config/dataServices.service";
 

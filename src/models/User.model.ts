@@ -1,6 +1,6 @@
 import { UsersSchemaModel } from "../schemas/UserSchema.schema";
 import { DateTime } from "luxon";
-import { IUser } from "../graphql/user.mapper";
+import { IUser } from "../graphql/user.types";
 import { AbstractModel, IFilterOpts } from "./common.types";
 import { IFilter } from "./diary.types";
 import { IDataSource } from "../dataSources/DataSource.datasource";

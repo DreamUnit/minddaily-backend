@@ -4,7 +4,7 @@ import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
 import { httpServer } from ".";
 import dotenv from "dotenv";
 import path from "path";
-import { IUser } from "./graphql/user.mapper";
+import { IUser } from "./graphql/user.types";
 import { typeDefs } from "./graphql/index.schemas";
 import { resolvers } from "./graphql/index.resolvers";
 

@@ -1,6 +1,6 @@
 import { IDataSource } from "../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../dataSources/DataSource.types";
-import { IDiary } from "../graphql/diary.mapper";
+import { IDiary } from "../graphql/diary.types";
 import { DiarySchemaModel } from "../schemas/DiarySchema.schema";
 import { AbstractModel, IFilterOpts } from "./common.types";
 import { IFilter } from "./diary.types";

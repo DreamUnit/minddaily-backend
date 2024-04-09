@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
-import { IUser } from "../graphql/user.mapper";
+import { IUser } from "../graphql/user.types";
 
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-import { IDiary } from "./diary.mapper";
+import { IDiary } from "./diary.types";
 import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
 
 import { DateTime } from "luxon";

@@ -1,6 +1,6 @@
 import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
 
-import { IDiaryNote } from "./diaryNotes.mapper";
+import { IDiaryNote } from "./diaryNotes.types";
 import {
     ICreateDiaryNoteRequest,
     IUpdateDiaryNoteRequest,
