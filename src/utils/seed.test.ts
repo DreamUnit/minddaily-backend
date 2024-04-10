@@ -10,7 +10,7 @@ import {
     ICreateUserRequest,
     ICreateDiaryNoteRequest,
 } from "../models/index.types";
-import { seedMongoDb } from "./seed.util";
+import { seedScript } from "./seed.util";
 import { DateTime } from "luxon";
 
 jest.mock("../config/dataServices.service", () => {
@@ -49,8 +49,8 @@ jest.mock("../config/dataServices.service", () => {
 
 describe("SeedMongoDb script", () => {
     it("sub functions and methods should be called correctly", async () => {
-        await seedMongoDb();
-        expect(logger);
+        await seedScript;
+        expect(logger.info).toHaveBeenCalledTimes(2);
 
         expect(dataSource.connect).toHaveBeenCalledTimes(1);
         expect(dataSource.close).toHaveBeenCalledTimes(1);
@@ -97,4 +97,8 @@ describe("SeedMongoDb script", () => {
         expect(diaryNote).toHaveProperty("text", "a note text");
         expect(diaryNote).toHaveProperty("diaryId", "exampleId1222");
     });
+});
+
+afterAll(async () => {
+    await dataSource.close();
 });
