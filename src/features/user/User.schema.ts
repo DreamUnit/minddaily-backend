@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MetaPropertiesSchema } from "./Common.schema";
+import { MetaPropertiesSchema } from "../common/AbstractSchema.schema";
 const { Schema } = mongoose;
 
 export const UserSchema = new Schema({

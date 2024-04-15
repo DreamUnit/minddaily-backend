@@ -1,8 +1,17 @@
-import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
-
-import { IUser } from "./user.types";
-import { ICreateUserRequest, IUpdateUserRequest } from "./user.types";
-import { userModel, diaryModel, logger } from "../config/dataServices.service";
+import {
+    IDelete,
+    IPagination,
+    IRead,
+    IReadMany,
+} from "../../common/common.types";
+import { DateTime } from "luxon";
+import { IUser } from "../user.types";
+import { IUpdateUserRequest } from "../user.types";
+import {
+    userModel,
+    diaryModel,
+    logger,
+} from "../../../config/dataServices.service";
 
 export const userResolvers = {
     Query: {
@@ -56,7 +65,12 @@ export const userResolvers = {
             { authUserId, name, email }
         ): Promise<IRead<IUser>> => {
             try {
-                const data = await userModel.create<ICreateUserRequest>({
+                const data = await userModel.create({
+                    createdDate: DateTime.utc(),
+                    version: 1,
+                    permissions: [],
+                    active: true,
+                    points: 0,
                     authUserId: authUserId,
                     name: name,
                     email: email,

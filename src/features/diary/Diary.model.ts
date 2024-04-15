@@ -1,11 +1,21 @@
-import { IDataSource } from "../dataSources/DataSource.datasource";
-import { IReadManyAndCountResult } from "../dataSources/DataSource.types";
-import { IDiary } from "../graphql/diary.types";
-import { DiarySchemaModel } from "../schemas/DiarySchema.schema";
-import { AbstractModel, IFilterOpts } from "./common.types";
+import { IDataSource } from "../../dataSources/DataSource.datasource";
+import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
+import {
+    ICreateDiaryRequest,
+    IDiary,
+    IUpdateDiaryRequest,
+} from "./diary.types";
+import { DiarySchemaModel } from "./Diary.schema";
 import { IFilter } from "./diary.types";
+import { IFilterOpts } from "../common/common.types";
+import { AbstractModel } from "../common/AbstractModel.model";
+import { DateTime } from "luxon";
 
-export class DiaryModel extends AbstractModel<IDiary> {
+export class DiaryModel extends AbstractModel<
+    ICreateDiaryRequest,
+    IUpdateDiaryRequest,
+    IDiary
+> {
     private readonly source: string = "diaries";
     private readonly model = DiarySchemaModel;
 
@@ -13,12 +23,14 @@ export class DiaryModel extends AbstractModel<IDiary> {
         super();
     }
 
-    async create<Data>(inputData: Data): Promise<IDiary> {
-        const data = await this.dataSource.write<Data, IDiary>(
+    async create(inputData: ICreateDiaryRequest): Promise<IDiary> {
+        const data = await this.dataSource.write<ICreateDiaryRequest, IDiary>(
             this.source,
             this.model,
             {
-                data: inputData,
+                data: {
+                    ...inputData,
+                },
             }
         );
 
@@ -28,12 +40,12 @@ export class DiaryModel extends AbstractModel<IDiary> {
         return null;
     }
 
-    async update<Data>(
+    async update(
         id: string | number,
-        updatedData: Data
+        updatedData: IUpdateDiaryRequest
     ): Promise<IDiary> {
         const updatedDataResponse = await this.dataSource.update<
-            Data,
+            IUpdateDiaryRequest,
             {},
             IDiary
         >(this.source, {

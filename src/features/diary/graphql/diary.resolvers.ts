@@ -1,13 +1,16 @@
-import { IDiary } from "./diary.types";
-import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
-
+import { IDiary } from "../diary.types";
+import {
+    IDelete,
+    IPagination,
+    IRead,
+    IReadMany,
+} from "../../common/common.types";
 import { DateTime } from "luxon";
-import { ICreateDiaryRequest, IUpdateDiaryRequest } from "./diary.types";
 import {
     diaryModel,
     diaryNotesModel,
     logger,
-} from "../config/dataServices.service";
+} from "../../../config/dataServices.service";
 
 export const diaryResolvers = {
     Query: {
@@ -58,7 +61,7 @@ export const diaryResolvers = {
     Mutation: {
         createDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
             try {
-                const data = await diaryModel.create<ICreateDiaryRequest>({
+                const data = await diaryModel.create({
                     createdDate: DateTime.utc(),
                     version: 1,
                     userId: userId,
@@ -86,7 +89,7 @@ export const diaryResolvers = {
             { id, userId, title }
         ): Promise<IRead<IDiary>> => {
             try {
-                const data = await diaryModel.update<IUpdateDiaryRequest>(id, {
+                const data = await diaryModel.update(id, {
                     userId: userId,
                     title: title,
                 });

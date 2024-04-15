@@ -1,7 +1,6 @@
 import express from "express";
 import passport from "passport";
-import jwt from "jsonwebtoken";
-import { IUser } from "../graphql/user.types";
+import { authController } from "../config/dataServices.service";
 
 const router = express.Router();
 
@@ -16,17 +15,7 @@ router.get(
         failureRedirect: "/login",
         failureMessage: true,
     }),
-    function (req, res) {
-        const user = req.user as IUser;
-        const token = jwt.sign(
-            { id: user.authUserId },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: "7d",
-            }
-        );
-        res.send({ user: user, token: token });
-    }
+    authController.handleAuth
 );
 
 export default router;

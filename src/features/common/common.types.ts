@@ -37,3 +37,9 @@ export interface IImage {
     url: string;
     title: string;
 }
+
+export interface IFilterOpts {
+    field: string;
+    stringValue?: string;
+    intValue?: number;
+}

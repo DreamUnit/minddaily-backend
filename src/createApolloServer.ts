@@ -4,9 +4,9 @@ import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
 import { httpServer } from ".";
 import dotenv from "dotenv";
 import path from "path";
-import { IUser } from "./graphql/user.types";
-import { typeDefs } from "./graphql/index.schemas";
-import { resolvers } from "./graphql/index.resolvers";
+import { IUser } from "./features/user/user.types";
+import { typeDefs } from "./features/index.schemas";
+import { resolvers } from "./features/index.resolvers";
 
 dotenv.config({
     path: path.resolve(

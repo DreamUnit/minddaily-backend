@@ -1,5 +1,5 @@
 import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
-import { IUser } from "./graphql/user.types";
+import { IUser } from "./features/user/user.types";
 
 export type DataSourceContext = {
     user?: IUser;

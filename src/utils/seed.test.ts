@@ -5,11 +5,7 @@ import {
     logger,
     userModel,
 } from "../config/dataServices.service";
-import {
-    ICreateDiaryRequest,
-    ICreateUserRequest,
-    ICreateDiaryNoteRequest,
-} from "../models/index.types";
+
 import { seedScript } from "./seed.util";
 import { DateTime } from "luxon";
 
@@ -62,18 +58,23 @@ describe("SeedMongoDb script", () => {
 
     it("should seed the database with the correct data", async () => {
         const testDate = DateTime.utc();
-        const user = await userModel.create<ICreateUserRequest>({
+        const user = await userModel.create({
+            createdDate: testDate,
+            version: 1,
             authUserId: `abcdef`,
             name: `Jane Doe`,
             email: `janedoe1@hotmail.com`,
             locale: `EU`,
+            permissions: ["readDiaries", "readDiaryNotes"],
+            active: true,
+            points: 0,
         });
         expect(user).toHaveProperty("authUserId", "abcdef");
         expect(user).toHaveProperty("name", "Jane Doe");
         expect(user).toHaveProperty("email", "janedoe1@hotmail.com");
         expect(user).toHaveProperty("locale", "EU");
 
-        const diary = await diaryModel.create<ICreateDiaryRequest>({
+        const diary = await diaryModel.create({
             createdDate: testDate,
             version: 1,
             userId: "exampleuserid123",
@@ -84,7 +85,7 @@ describe("SeedMongoDb script", () => {
         expect(diary).toHaveProperty("userId", "exampleuserid123");
         expect(diary).toHaveProperty("title", "a test title");
 
-        const diaryNote = await userModel.create<ICreateDiaryNoteRequest>({
+        const diaryNote = await diaryNotesModel.create({
             createdDate: testDate,
             version: 1,
             title: "a note title",

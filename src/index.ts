@@ -12,8 +12,8 @@ import { startServer } from "./server";
 import { DataSourceContext } from "./context";
 import googleStrategy from "./auth/passport.auth";
 import sessionConfig from "./auth/session.auth";
-import { typeDefs } from "./graphql/index.schemas";
-import { resolvers } from "./graphql/index.resolvers";
+import { typeDefs } from "./features/index.schemas";
+import { resolvers } from "./features/index.resolvers";
 
 dotenv.config({
     path: path.resolve(

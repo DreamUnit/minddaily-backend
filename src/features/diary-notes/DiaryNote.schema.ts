@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
-import { ImageSchema, MetaPropertiesSchema } from "./Common.schema";
+import { MetaPropertiesSchema } from "../common/AbstractSchema.schema";
 const { Schema } = mongoose;
+
+export const ImageSchema = new Schema({
+    diaryNoteId: {
+        type: Schema.Types.ObjectId,
+        ref: "diary_notes",
+        required: true,
+    },
+    url: { type: String, required: true },
+    title: { type: String, required: true },
+});
 
 const DiaryNoteSchema = new Schema({
     title: { type: String, required: true },

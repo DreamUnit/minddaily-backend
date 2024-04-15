@@ -1,12 +1,17 @@
-import { UsersSchemaModel } from "../schemas/UserSchema.schema";
+import { UsersSchemaModel } from "./User.schema";
 import { DateTime } from "luxon";
-import { IUser } from "../graphql/user.types";
-import { AbstractModel, IFilterOpts } from "./common.types";
-import { IFilter } from "./diary.types";
-import { IDataSource } from "../dataSources/DataSource.datasource";
-import { IReadManyAndCountResult } from "../dataSources/DataSource.types";
+import { ICreateUserRequest, IUpdateUserRequest, IUser } from "./user.types";
+import { IFilter } from "./user.types";
+import { IDataSource } from "../../dataSources/DataSource.datasource";
+import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
+import { AbstractModel } from "../common/AbstractModel.model";
+import { IFilterOpts } from "../common/common.types";
 
-export class UserModel extends AbstractModel<IUser> {
+export class UserModel extends AbstractModel<
+    ICreateUserRequest,
+    IUpdateUserRequest,
+    IUser
+> {
     private readonly source: string = "users";
     private readonly model = UsersSchemaModel;
 
@@ -14,17 +19,12 @@ export class UserModel extends AbstractModel<IUser> {
         super();
     }
 
-    async create<Data>(inputData: Data): Promise<IUser> {
-        const data = await this.dataSource.write<Data, IUser>(
+    async create(inputData: ICreateUserRequest): Promise<IUser> {
+        const data = await this.dataSource.write<ICreateUserRequest, IUser>(
             this.source,
             this.model,
             {
                 data: {
-                    createdDate: DateTime.utc(),
-                    version: 1,
-                    permissions: [],
-                    active: true,
-                    points: 0,
                     ...inputData,
                 },
             }

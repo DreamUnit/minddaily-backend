@@ -1,12 +1,21 @@
-import { IDataSource } from "../dataSources/DataSource.datasource";
-import { IReadManyAndCountResult } from "../dataSources/DataSource.types";
-import { IDiaryNote } from "../graphql/diaryNotes.types";
-import { DiaryNoteSchemaModel } from "../schemas/DiaryNoteSchema.schema";
-import { AbstractModel, IFilterOpts } from "./common.types";
-import { IFilter } from "./diary.types";
+import { IDataSource } from "../../dataSources/DataSource.datasource";
+import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
+import {
+    ICreateDiaryNoteRequest,
+    IDiaryNote,
+    IUpdateDiaryNoteRequest,
+} from "./diaryNotes.types";
+import { DiaryNoteSchemaModel } from "./DiaryNote.schema";
 import { DateTime } from "luxon";
+import { IFilter } from "./diaryNotes.types";
+import { AbstractModel } from "../common/AbstractModel.model";
+import { IFilterOpts } from "../common/common.types";
 
-export class DiaryNotesModel extends AbstractModel<IDiaryNote> {
+export class DiaryNotesModel extends AbstractModel<
+    ICreateDiaryNoteRequest,
+    IUpdateDiaryNoteRequest,
+    IDiaryNote
+> {
     private readonly source: string = "diary_notes";
     private readonly model = DiaryNoteSchemaModel;
 
@@ -14,19 +23,15 @@ export class DiaryNotesModel extends AbstractModel<IDiaryNote> {
         super();
     }
 
-    async create<Data>(inputData: Data): Promise<IDiaryNote> {
-        const data = await this.dataSource.write<Data, IDiaryNote>(
-            this.source,
-            this.model,
-            {
-                data: {
-                    createdDate: DateTime.utc(),
-                    version: 1,
-
-                    ...inputData,
-                },
-            }
-        );
+    async create(inputData: ICreateDiaryNoteRequest): Promise<IDiaryNote> {
+        const data = await this.dataSource.write<
+            ICreateDiaryNoteRequest,
+            IDiaryNote
+        >(this.source, this.model, {
+            data: {
+                ...inputData,
+            },
+        });
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -86,13 +91,14 @@ export class DiaryNotesModel extends AbstractModel<IDiaryNote> {
         take: number,
         skip: number
     ): Promise<IReadManyAndCountResult<IDiaryNote>> {
-        const data = await this.dataSource.read<IFilter, IDiaryNote>(
+        let data = await this.dataSource.read<IFilter, IDiaryNote>(
             this.source,
             {
                 take: take,
                 skip: skip,
             }
         );
+
         return data;
     }
 

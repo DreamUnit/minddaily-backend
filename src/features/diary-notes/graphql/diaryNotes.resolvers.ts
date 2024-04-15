@@ -1,11 +1,16 @@
-import { IDelete, IPagination, IRead, IReadMany } from "./common.types";
-
-import { IDiaryNote } from "./diaryNotes.types";
+import {
+    IDelete,
+    IPagination,
+    IRead,
+    IReadMany,
+} from "../../common/common.types";
+import { DateTime } from "luxon";
+import { IDiaryNote } from "../diaryNotes.types";
 import {
     ICreateDiaryNoteRequest,
     IUpdateDiaryNoteRequest,
-} from "./diaryNotes.types";
-import { diaryNotesModel } from "../config/dataServices.service";
+} from "../diaryNotes.types";
+import { diaryNotesModel } from "../../../config/dataServices.service";
 
 export const diaryNotesResolvers = {
     Query: {
@@ -62,12 +67,13 @@ export const diaryNotesResolvers = {
             { title, text, diaryId }
         ): Promise<IRead<IDiaryNote>> => {
             try {
-                const data =
-                    await diaryNotesModel.create<ICreateDiaryNoteRequest>({
-                        title: title,
-                        text: text,
-                        diaryId: diaryId,
-                    });
+                const data = await diaryNotesModel.create({
+                    createdDate: DateTime.utc(),
+                    version: 1,
+                    title: title,
+                    text: text,
+                    diaryId: diaryId,
+                });
                 return {
                     code: 200,
                     success: true,

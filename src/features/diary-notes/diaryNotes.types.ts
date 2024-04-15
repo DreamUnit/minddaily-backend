@@ -1,6 +1,13 @@
-import { IImage, IMetaProperties } from "./common.types";
+import { IImage, IMetaProperties } from "../common/common.types";
+import { DateTime } from "luxon";
+
+export interface IFilter {}
+
+export interface ISort {}
 
 export interface ICreateDiaryNoteRequest {
+    createdDate: DateTime;
+    version: number;
     title: string;
     text: string;
     diaryId: string | number;
