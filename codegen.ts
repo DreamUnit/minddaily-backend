@@ -13,18 +13,10 @@ dotenv.config({
 const config: CodegenConfig = {
     overwrite: true,
     debug: process.env.NODE_ENV === "development",
-    schema: process.env.SCHEMA_PORT,
+    schema: "./src/graphql/*.schemas.ts",
     generates: {
         "src/__generated__/types.ts": {
             plugins: ["typescript", "typescript-resolvers"],
-            config: {
-                contextType: "./src/context#DataSourceContext",
-                mappers: {
-                    User: "../graphql/mappers/User#IUser",
-                    Diary: "../graphql/mappers/Diary#IDiary",
-                    DiaryNote: "../graphql/mappers/DiaryNotes#IDiaryNote",
-                },
-            },
         },
     },
 };

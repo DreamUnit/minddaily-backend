@@ -3,8 +3,6 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import express from "express";
 import http from "http";
 import cors from "cors";
-import { typeDefs } from "./graphql/schemas/index";
-import { resolvers } from "./graphql/resolvers/index";
 import dotenv from "dotenv";
 import passport from "passport";
 import path from "path";
@@ -12,8 +10,10 @@ import session from "express-session";
 import routes from "./routes/index";
 import { startServer } from "./server";
 import { DataSourceContext } from "./context";
-import googleStrategy from "./auth/passport";
-import sessionConfig from "./auth/session";
+import googleStrategy from "./auth/passport.auth";
+import sessionConfig from "./auth/session.auth";
+import { typeDefs } from "./features/index.schemas";
+import { resolvers } from "./features/index.resolvers";
 
 dotenv.config({
     path: path.resolve(

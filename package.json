@@ -4,11 +4,11 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest",
+        "test": "jest ",
         "build": "tsc",
         "start": "nodemon",
         "codegen": "graphql-codegen --config codegen.ts",
-        "seed": "node ./dist/utils/seed.js"
+        "seed": "node ./dist/utils/seed.util.js"
     },
     "repository": {
         "type": "git",

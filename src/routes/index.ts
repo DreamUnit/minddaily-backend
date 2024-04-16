@@ -1,5 +1,5 @@
-import protectedRouter from "./protected/graphqlRoute";
-import publicRouter from "./public/AuthRoutes";
+import protectedRouter from "./protected";
+import publicRouter from "./public";
 
 const routes = { publicRouter, protectedRouter };
 export default routes;
