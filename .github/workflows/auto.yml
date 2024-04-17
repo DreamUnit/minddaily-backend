@@ -1,0 +1,18 @@
+name: Automated Testing and Verification 🤖
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build image 🛠
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository 🔎
+        uses: actions/checkout@v3
+
+      - name: Build Docker image 🐳
+        run: |
+          docker build -f docker/staging/Dockerfile . --tag ${{ secrets.DOCKER_USERNAME }}/stage-deployment
