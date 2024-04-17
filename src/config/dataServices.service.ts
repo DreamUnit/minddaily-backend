@@ -8,6 +8,7 @@ import { WinstonLogger } from "../utils/WinstonLogger.util";
 import { Logger } from "../utils/Logger.util";
 import AuthController from "../controllers/Auth.controller";
 import { DiaryModel } from "../features/index.model";
+import express from "express";
 
 dotenv.config({
     path: path.resolve(
@@ -17,6 +18,7 @@ dotenv.config({
             : "../../development.env"
     ),
 });
+
 // Logger instantiation
 export const logger: ILogger = new Logger(new WinstonLogger());
 

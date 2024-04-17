@@ -23,8 +23,8 @@ dotenv.config({
             : "../development.env"
     ),
 });
-
 export const app = express();
+
 export const httpServer = http.createServer(app);
 export const server = new ApolloServer<DataSourceContext>({
     typeDefs,
