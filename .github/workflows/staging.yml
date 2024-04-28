@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ./docker/staging/Dockerfile
           push: true
-          tags: joshibbotson/staging-server:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
           platforms: linux/amd64,linux/arm64
 
   deploy:
@@ -48,10 +48,10 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           script: |
-              docker pull joshibbotson/staging-server:latest
-              docker stop staging-server || true
-              docker rm staging-server
-              docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+              docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+              docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+              docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
 
   teardown-staging:
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
@@ -65,7 +65,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           script: |
-            docker stop staging-server || true
-            docker rm staging-server
-            docker rmi joshibbotson/staging-server:latest
+            docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+            docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
             docker system prune -af

@@ -27,7 +27,7 @@ jobs:
           context: .
           file: ./docker/production/Dockerfile
           push: true
-          tags: joshibbotson/production-server:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PROD_IMAGE_NAME }}:latest
           platforms: linux/amd64,linux/arm64
 
   deploy:
@@ -43,7 +43,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           script: |
-              docker pull joshibbotson/production-server:latest
-              docker stop production-server || true
-              docker rm production-server
-              docker run -d -p 8082:8082 --env-file=/home/ubuntu/repos/production.env  --name production-server joshibbotson/production-server:latest
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PROD_IMAGE_NAME }}:latest
+              docker stop ${{ secrets.DOCKER_PROD_IMAGE_NAME }} || true
+              docker rm ${{ secrets.DOCKER_PROD_IMAGE_NAME }}
+              docker run -d -p 8082:8082 --env-file=/home/ubuntu/repos/production.env  --name ${{ secrets.DOCKER_PROD_IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PROD_IMAGE_NAME }}:latest
