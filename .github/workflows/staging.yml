@@ -1,115 +1,71 @@
-name: Build, Deploy, and Teardown AWS EC2 Staging
+name: Staging 🏗
 
 on:
-    workflow_dispatch:
-        inputs:
-            runTeardown:
-                description: "Run teardown job (yes/no)"
-                required: true
-                default: "no"
+  workflow_dispatch:
+    inputs:
+      runTeardown:
+        description: "Run teardown job (yes/no)"
+        required: true
+        default: "no"
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        name: Build docker image and push to dockerhub
-        steps:
-            - name: Checkout Repo
-              uses: actions/checkout@v2
+  build:
+    name: Build and publish image 🛠️
+    runs-on: ubuntu-latest
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v1
+    steps:
+      - name: Checkout repository 🔎
+        uses: actions/checkout@v2
 
-            - name: Login to DockerHub
-              uses: docker/login-action@v1
-              with:
-                  username: ${{ secrets.DOCKER_USERNAME }}
-                  password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx ⚒️
+        uses: docker/setup-buildx-action@v1
 
-            - name: Build and Push Docker image
-              uses: docker/build-push-action@v2
-              with:
-                  context: .
-                  file: ./docker/staging/Dockerfile
-                  push: true
-                  tags: joshibbotson/staging-server:latest
-                  platforms: linux/amd64,linux/arm64
+      - name: Login to DockerHub 🔑
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    deploy:
-        needs: build
-        runs-on: ubuntu-latest
-        steps:
-            - name: Pull and run container
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.SSHKEY }}
-                  script: |
-                      docker pull joshibbotson/staging-server:latest
-                      docker stop staging-server || true
-                      docker rm staging-server
-                      docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name staging-server joshibbotson/staging-server:latest
-    # May be worth getting this working at some point.
-    # codegen:
-    #     needs: deploy
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #         - name: Wait for Server to be Ready
-    #           uses: appleboy/ssh-action@master
-    #           with:
-    #               host: ${{ secrets.HOST }}
-    #               username: ${{ secrets.USERNAME }}
-    #               key: ${{ secrets.SSHKEY }}
-    #               script: |
-    #                   # Define the endpoint to check, adjust the URL as needed
-    #                   URL="http://localhost:8083/health"
+      - name: Build and Push Docker image 🐳📦
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/staging/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+          platforms: linux/amd64,linux/arm64
 
-    #                   # Maximum number of attempts to check if the server is up
-    #                   MAX_ATTEMPTS=30
+  deploy:
+    needs: build
+    name: Deploy image 🚀
+    runs-on: ubuntu-latest
 
-    #                   # Delay (in seconds) between attempts
-    #                   DELAY_SECONDS=10
+    steps:
+      - name: Pull and run container 🏃️
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          script: |
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+              docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+              docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+              docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
 
-    #                   echo "Checking if server is up..."
+  teardown-staging:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
+    runs-on: ubuntu-latest
 
-    #                   for (( attempt=1; attempt<=MAX_ATTEMPTS; attempt++ ))
-    #                   do
-    #                     # Use curl to send a GET request to the server
-    #                     if curl --output /dev/null --silent --head --fail "$URL"; then
-    #                       echo "Server is up and running!"
-    #                       break
-    #                     else
-    #                       echo "Attempt $attempt of $MAX_ATTEMPTS failed. Retrying in $DELAY_SECONDS seconds..."
-    #                       sleep $DELAY_SECONDS
-    #                     fi
-
-    #                     # If this was the last attempt, exit with an error
-    #                     if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
-    #                       echo "Server did not become ready in time."
-    #                       exit 1
-    #                     fi
-    #                   done
-    #         - name: Run npm run codegen within Container
-    #           uses: appleboy/ssh-action@master
-    #           with:
-    #               host: ${{ secrets.HOST }}
-    #               username: ${{ secrets.USERNAME }}
-    #               key: ${{ secrets.SSHKEY }}
-    #               script: |
-    #                   docker exec staging-server npm run codegen
-
-    teardown-staging:
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: Teardown Staging Server
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.SSHKEY }}
-                  script: |
-                      docker stop staging-server || true
-                      docker rm staging-server
-                      docker rmi joshibbotson/staging-server:latest
-                      docker system prune -af
+    steps:
+      - name: Teardown staging server 👷🏼
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          script: |
+            docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+            docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+            docker system prune -af
