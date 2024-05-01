@@ -1,21 +1,17 @@
-import { app, httpServer, server } from ".";
 import { DataSourceContext } from "./context";
 import { expressMiddleware } from "@apollo/server/express4";
 import routes from "./routes/index";
 import { dataSource, logger } from "./config/dataServices.service";
+import { app, httpServer, apolloServer } from "./app";
 
 export async function startServer() {
     await dataSource.connect();
-    await server.start();
+    await apolloServer.start();
     app.use(
         routes.protectedRouter,
-        expressMiddleware(server, {
+        expressMiddleware(apolloServer, {
             context: async ({ req }): Promise<DataSourceContext> => {
-                const user = req.session?.passport?.user
-                    ? req.session.passport.user.id
-                    : undefined;
                 return {
-                    user,
                     dataSources: {
                         mongodbDataSource: dataSource,
                     },

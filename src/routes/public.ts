@@ -19,6 +19,7 @@ router.get(
 );
 
 router.get("/health", (req, res) => {
+    console.log("I have been called");
     res.status(200).json({
         status: "success",
         message: "Health check passed",

@@ -12,6 +12,7 @@ const sessionConfig = {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
     }, // 1 day
+    pauseStream: false,
 };
 
 export default sessionConfig;
