@@ -1,7 +1,7 @@
 import { ApolloServer } from "@apollo/server";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
-import { httpServer } from ".";
+import { httpServer } from "./app";
 import dotenv from "dotenv";
 import path from "path";
 import { IUser } from "./features/user/user.types";
