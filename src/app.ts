@@ -11,7 +11,17 @@ import googleStrategy from "./auth/passport.auth";
 import sessionConfig from "./auth/session.auth";
 import { typeDefs } from "./features/index.schemas";
 import { resolvers } from "./features/index.resolvers";
+import dotenv from "dotenv";
+import path from "path";
 
+dotenv.config({
+    path: path.resolve(
+        __dirname,
+        process.env.NODE_ENV === "production"
+            ? "../production.env"
+            : "../development.env"
+    ),
+});
 export const app = express();
 export const httpServer = http.createServer(app);
 export const apolloServer = new ApolloServer<DataSourceContext>({
