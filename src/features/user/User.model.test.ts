@@ -1,8 +1,10 @@
+import {
+    MutationCreateUserArgs,
+    MutationUpdateUserArgs,
+} from "../../__generated__/types";
 import { MockDataSource } from "../../__mocks__/MockDataSource";
-import { logger } from "../../config/dataServices.service";
 import { UserModel } from "./User.model";
 import { UsersSchemaModel } from "./User.schema";
-import { ICreateUserRequest } from "./user.types";
 import { DateTime } from "luxon";
 describe("UserModel", () => {
     let userModel: UserModel;
@@ -18,13 +20,8 @@ describe("UserModel", () => {
     });
 
     it("should create a user and return user data", async () => {
-        const userData: ICreateUserRequest = {
-            createdDate: DateTime.now(),
-            version: 1,
+        const userData: MutationCreateUserArgs = {
             authUserId: "authUserId123",
-            permissions: ["read", "write"],
-            active: true,
-            points: 100,
             name: "John Doe",
             email: "john@example.com",
             locale: "en-US",
@@ -51,11 +48,11 @@ describe("UserModel", () => {
 
     it("should update a user and return updated data", async () => {
         const mockUpdateData = {
+            id: "123",
             name: "Updated Name",
         };
-        const expectedUser = {
+        const expectedUser: MutationUpdateUserArgs = {
             ...mockUpdateData,
-            updatedDate: DateTime.utc(),
         };
         mockDataSource.update.mockResolvedValue(expectedUser);
 

@@ -1,10 +1,10 @@
 import AbstractController from "./AbstractController.controller";
 import jwt from "jsonwebtoken";
-import { IUser } from "../features/user/user.types";
+import { User } from "../__generated__/types";
 
 class AuthController extends AbstractController {
     public handleAuth(req, res) {
-        const user = req.user as IUser;
+        const user = req.user as User;
         const token = jwt.sign(
             { id: user.authUserId },
             process.env.JWT_SECRET,

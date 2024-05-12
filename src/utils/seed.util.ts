@@ -5,7 +5,6 @@ import {
     dataSource,
     logger,
 } from "../config/dataServices.service";
-import { DateTime } from "luxon";
 
 const firstNames = [
     "John",
@@ -65,27 +64,18 @@ export async function seedMongoDb() {
             randomV2 = Math.floor(Math.random() * 7);
 
             const user = await userModel.create({
-                createdDate: DateTime.utc(),
-                version: 1,
                 authUserId: `abcdef${i}`,
                 name: `${firstNames[random]} ${foreNames[randomV2]}`,
                 email: `${firstNames[random]} ${foreNames[randomV2]}${i}@hotmail.com`,
                 locale: `EU`,
-                permissions: ["readDiaries", "readDiaryNotes"],
-                active: true,
-                points: 0,
             });
 
             const diary = await diaryModel.create({
-                createdDate: DateTime.utc(),
-                version: 1,
                 userId: user.id,
                 title: diaryTitles[random],
             });
 
             await diaryNotesModel.create({
-                createdDate: DateTime.utc(),
-                version: 1,
                 title: diaryNoteTitles[random],
                 text: diaryNoteTexts[random],
                 diaryId: diary.id,

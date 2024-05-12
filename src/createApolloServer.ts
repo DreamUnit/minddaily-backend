@@ -4,9 +4,9 @@ import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
 import { httpServer } from "./app";
 import dotenv from "dotenv";
 import path from "path";
-import { IUser } from "./features/user/user.types";
 import { typeDefs } from "./features/index.schemas";
 import { resolvers } from "./features/index.resolvers";
+import { User } from "./__generated__/types";
 
 dotenv.config({
     path: path.resolve(
@@ -17,7 +17,7 @@ dotenv.config({
     ),
 });
 export interface IContext {
-    user?: IUser;
+    user?: User;
     token?: string;
     dataSources: {
         mongodbDataSource: MongodbDataSource;

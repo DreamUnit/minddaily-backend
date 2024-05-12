@@ -59,15 +59,10 @@ describe("SeedMongoDb script", () => {
     it("should seed the database with the correct data", async () => {
         const testDate = DateTime.utc();
         const user = await userModel.create({
-            createdDate: testDate,
-            version: 1,
             authUserId: `abcdef`,
             name: `Jane Doe`,
             email: `janedoe1@hotmail.com`,
-            locale: `EU`,
-            permissions: ["readDiaries", "readDiaryNotes"],
-            active: true,
-            points: 0,
+            locale: "en-GB",
         });
         expect(user).toHaveProperty("authUserId", "abcdef");
         expect(user).toHaveProperty("name", "Jane Doe");
@@ -75,8 +70,6 @@ describe("SeedMongoDb script", () => {
         expect(user).toHaveProperty("locale", "EU");
 
         const diary = await diaryModel.create({
-            createdDate: testDate,
-            version: 1,
             userId: "exampleuserid123",
             title: "a test title",
         });
@@ -86,8 +79,6 @@ describe("SeedMongoDb script", () => {
         expect(diary).toHaveProperty("title", "a test title");
 
         const diaryNote = await diaryNotesModel.create({
-            createdDate: testDate,
-            version: 1,
             title: "a note title",
             text: "a note text",
             diaryId: "exampleId1222",

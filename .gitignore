@@ -5,6 +5,5 @@ production.env
 staging.env
 .env
 combined.log
-__generated__
 data
 coverage
