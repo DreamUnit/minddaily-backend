@@ -25,7 +25,7 @@ export const diaryNoteTypeDefs = gql`
         ): ReadDiaryNoteResponse
         updateDiaryNote(
             id: ID!
-            title: String!
+            title: String
             text: String
         ): ReadDiaryNoteResponse
         deleteDiaryNote(id: ID!): DeleteResponse

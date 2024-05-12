@@ -1,20 +1,19 @@
 import { IDataSource } from "../../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
-import {
-    ICreateDiaryNoteRequest,
-    IDiaryNote,
-    IUpdateDiaryNoteRequest,
-} from "./diaryNotes.types";
 import { DiaryNoteSchemaModel } from "./DiaryNote.schema";
-import { DateTime } from "luxon";
-import { IFilter } from "./diaryNotes.types";
+
 import { AbstractModel } from "../common/AbstractModel.model";
-import { IFilterOpts } from "../common/common.types";
+import {
+    DiaryFilterOpts,
+    DiaryNote,
+    MutationCreateDiaryNoteArgs,
+    MutationUpdateDiaryNoteArgs,
+} from "../../__generated__/types";
 
 export class DiaryNotesModel extends AbstractModel<
-    ICreateDiaryNoteRequest,
-    IUpdateDiaryNoteRequest,
-    IDiaryNote
+    MutationCreateDiaryNoteArgs,
+    MutationUpdateDiaryNoteArgs,
+    DiaryNote
 > {
     private readonly source: string = "diary_notes";
     private readonly model = DiaryNoteSchemaModel;
@@ -23,15 +22,18 @@ export class DiaryNotesModel extends AbstractModel<
         super();
     }
 
-    async create(inputData: ICreateDiaryNoteRequest): Promise<IDiaryNote> {
-        const data = await this.dataSource.write<
-            ICreateDiaryNoteRequest,
-            IDiaryNote
-        >(this.source, this.model, {
-            data: {
-                ...inputData,
-            },
-        });
+    public async create(
+        inputData: MutationCreateDiaryNoteArgs
+    ): Promise<DiaryNote> {
+        const data = await this.dataSource.write<Partial<DiaryNote>, DiaryNote>(
+            this.source,
+            this.model,
+            {
+                data: {
+                    ...inputData,
+                },
+            }
+        );
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -39,14 +41,14 @@ export class DiaryNotesModel extends AbstractModel<
         return null;
     }
 
-    async update<Data>(
+    public async update(
         id: string | number,
-        updatedData: Data
-    ): Promise<IDiaryNote> {
+        updatedData: MutationUpdateDiaryNoteArgs
+    ): Promise<DiaryNote> {
         const updatedDataResponse = await this.dataSource.update<
-            Data,
+            DiaryNote,
             {},
-            IDiaryNote
+            DiaryNote
         >(this.source, {
             id: id,
             data: updatedData,
@@ -54,7 +56,7 @@ export class DiaryNotesModel extends AbstractModel<
         return updatedDataResponse;
     }
 
-    async delete(id: string | number): Promise<boolean> {
+    public async delete(id: string | number): Promise<boolean> {
         const deleteResponse = await this.dataSource.deleteById(
             this.source,
             this.model,
@@ -65,11 +67,8 @@ export class DiaryNotesModel extends AbstractModel<
         return deleteResponse;
     }
 
-    async readById(id: string): Promise<IDiaryNote | null> {
-        const data = await this.dataSource.readById<IDiaryNote>(
-            this.source,
-            id
-        );
+    public async readById(id: string): Promise<DiaryNote | null> {
+        const data = await this.dataSource.readById<DiaryNote>(this.source, id);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -77,9 +76,11 @@ export class DiaryNotesModel extends AbstractModel<
         return null;
     }
 
-    async readByField(filter: IFilterOpts): Promise<IDiaryNote[] | null> {
+    public async readByField(
+        filter: DiaryFilterOpts
+    ): Promise<DiaryNote[] | null> {
         const value = filter.stringValue || filter.intValue;
-        let queryResult = await this.dataSource.readByField<IDiaryNote>(
+        let queryResult = await this.dataSource.readByField<DiaryNote>(
             this.source,
             filter.field,
             value
@@ -87,11 +88,11 @@ export class DiaryNotesModel extends AbstractModel<
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
-    async readMany(
+    public async readMany(
         take: number,
         skip: number
-    ): Promise<IReadManyAndCountResult<IDiaryNote>> {
-        let data = await this.dataSource.read<IFilter, IDiaryNote>(
+    ): Promise<IReadManyAndCountResult<DiaryNote>> {
+        let data = await this.dataSource.read<DiaryFilterOpts, DiaryNote>(
             this.source,
             {
                 take: take,
@@ -100,17 +101,5 @@ export class DiaryNotesModel extends AbstractModel<
         );
 
         return data;
-    }
-
-    async readByDiaryId(id: string | number) {
-        const data = await this.dataSource.readById<IDiaryNote>(
-            this.source,
-            id
-        );
-
-        if (data !== null && Object.keys(data).length > 0) {
-            return data;
-        }
-        return null;
     }
 }

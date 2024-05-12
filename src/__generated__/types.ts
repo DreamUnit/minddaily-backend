@@ -127,14 +127,14 @@ export type MutationUpdateDiaryArgs = {
 export type MutationUpdateDiaryNoteArgs = {
   id: Scalars['ID']['input'];
   text?: InputMaybe<Scalars['String']['input']>;
-  title: Scalars['String']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationUpdateUserArgs = {
   active?: InputMaybe<Scalars['Boolean']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   permissions?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -427,8 +427,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteDiaryNote?: Resolver<Maybe<ResolversTypes['DeleteResponse']>, ParentType, ContextType, RequireFields<MutationDeleteDiaryNoteArgs, 'id'>>;
   deleteUser?: Resolver<Maybe<ResolversTypes['DeleteResponse']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateDiary?: Resolver<Maybe<ResolversTypes['ReadDiaryResponse']>, ParentType, ContextType, RequireFields<MutationUpdateDiaryArgs, 'id'>>;
-  updateDiaryNote?: Resolver<Maybe<ResolversTypes['ReadDiaryNoteResponse']>, ParentType, ContextType, RequireFields<MutationUpdateDiaryNoteArgs, 'id' | 'title'>>;
-  updateUser?: Resolver<Maybe<ResolversTypes['ReadUserResponse']>, ParentType, ContextType, Partial<MutationUpdateUserArgs>>;
+  updateDiaryNote?: Resolver<Maybe<ResolversTypes['ReadDiaryNoteResponse']>, ParentType, ContextType, RequireFields<MutationUpdateDiaryNoteArgs, 'id'>>;
+  updateUser?: Resolver<Maybe<ResolversTypes['ReadUserResponse']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

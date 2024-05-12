@@ -20,7 +20,7 @@ export const userTypeDefs = gql`
             locale: String!
         ): ReadUserResponse
         updateUser(
-            id: ID
+            id: ID!
             name: String
             active: Boolean
             email: String

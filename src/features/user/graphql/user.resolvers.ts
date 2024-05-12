@@ -1,5 +1,3 @@
-import { DateTime } from "luxon";
-import { IUpdateUserRequest } from "../user.types";
 import {
     userModel,
     diaryModel,
@@ -108,6 +106,7 @@ export const userResolvers = {
         ): Promise<ReadUserResponse> => {
             try {
                 const data = await userModel.update(id, {
+                    id,
                     name,
                     email,
                     active,

@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import {
     diaryModel,
     diaryNotesModel,
@@ -71,10 +70,8 @@ export const diaryResolvers = {
         ): Promise<ReadDiaryResponse> => {
             try {
                 const data = await diaryModel.create({
-                    createdDate: DateTime.utc(),
-                    version: 1,
-                    userId: userId,
-                    title: title,
+                    userId,
+                    title,
                 });
 
                 return {
@@ -99,8 +96,9 @@ export const diaryResolvers = {
         ): Promise<ReadDiaryResponse> => {
             try {
                 const data = await diaryModel.update(id, {
-                    userId: userId,
-                    title: title,
+                    id,
+                    userId,
+                    title,
                 });
                 return {
                     code: 200,

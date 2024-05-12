@@ -48,6 +48,7 @@ describe("UserModel", () => {
 
     it("should update a user and return updated data", async () => {
         const mockUpdateData = {
+            id: "123",
             name: "Updated Name",
         };
         const expectedUser: MutationUpdateUserArgs = {

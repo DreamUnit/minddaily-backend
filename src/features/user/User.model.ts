@@ -22,7 +22,7 @@ export class UserModel extends AbstractModel<
         super();
     }
 
-    async create(inputData: MutationCreateUserArgs): Promise<User> {
+    public async create(inputData: MutationCreateUserArgs): Promise<User> {
         const data = await this.dataSource.write<Partial<User>, User>(
             this.source,
             this.model,
@@ -46,7 +46,7 @@ export class UserModel extends AbstractModel<
         return null;
     }
 
-    async update(
+    public async update(
         id: number | string,
         updatedData: MutationUpdateUserArgs
     ): Promise<User> {
@@ -63,7 +63,7 @@ export class UserModel extends AbstractModel<
         return updatedDataResponse;
     }
 
-    async delete(id: string | number): Promise<boolean> {
+    public async delete(id: string | number): Promise<boolean> {
         const deleteResponse = await this.dataSource.deleteById(
             this.source,
             this.model,
@@ -74,7 +74,7 @@ export class UserModel extends AbstractModel<
         return deleteResponse;
     }
 
-    async readById(id: string | number): Promise<User | null> {
+    public async readById(id: string | number): Promise<User | null> {
         const data = await this.dataSource.readById<User>(this.source, id);
 
         if (data !== null && Object.keys(data).length > 0) {
@@ -83,7 +83,7 @@ export class UserModel extends AbstractModel<
         return null;
     }
 
-    async readByField(filter: UserFilterOpts): Promise<User[] | null> {
+    public async readByField(filter: UserFilterOpts): Promise<User[] | null> {
         const value = filter.stringValue || filter.intValue;
         let queryResult = await this.dataSource.readByField<User>(
             this.source,
@@ -93,7 +93,7 @@ export class UserModel extends AbstractModel<
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
-    async readMany(
+    public async readMany(
         take: number,
         skip: number
     ): Promise<IReadManyAndCountResult<User>> {

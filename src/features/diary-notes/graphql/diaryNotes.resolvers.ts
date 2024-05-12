@@ -1,5 +1,3 @@
-import { DateTime } from "luxon";
-import { IUpdateDiaryNoteRequest } from "../diaryNotes.types";
 import { diaryNotesModel } from "../../../config/dataServices.service";
 import {
     DeleteResponse,
@@ -71,8 +69,6 @@ export const diaryNotesResolvers = {
         ): Promise<ReadDiaryNoteResponse> => {
             try {
                 const data = await diaryNotesModel.create({
-                    createdDate: DateTime.utc(),
-                    version: 1,
                     title: title,
                     text: text,
                     diaryId: diaryId,
@@ -98,11 +94,11 @@ export const diaryNotesResolvers = {
             { id, title, text }: MutationUpdateDiaryNoteArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data =
-                    await diaryNotesModel.update<IUpdateDiaryNoteRequest>(id, {
-                        title: title,
-                        text: text,
-                    });
+                const data = await diaryNotesModel.update(id, {
+                    id,
+                    title: title,
+                    text: text,
+                });
                 return {
                     code: 200,
                     success: true,
