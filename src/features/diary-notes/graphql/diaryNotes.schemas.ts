@@ -28,7 +28,7 @@ export const diaryNoteTypeDefs = gql`
             title: String!
             text: String
         ): ReadDiaryNoteResponse
-        deleteDiaryNote(id: ID!): ReadDiaryNoteResponse
+        deleteDiaryNote(id: ID!): DeleteResponse
     }
 
     type Image {
@@ -61,5 +61,11 @@ export const diaryNoteTypeDefs = gql`
         message: String
         data: [DiaryNote]
         count: Int
+    }
+
+    type DeleteResponse {
+        code: Int!
+        success: Boolean!
+        message: String
     }
 `;

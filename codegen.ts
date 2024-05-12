@@ -13,7 +13,7 @@ dotenv.config({
 const config: CodegenConfig = {
     overwrite: true,
     debug: process.env.NODE_ENV === "development",
-    schema: "./src/graphql/*.schemas.ts",
+    schema: "./src/features/*/graphql/*.schemas.ts",
     generates: {
         "src/__generated__/types.ts": {
             plugins: ["typescript", "typescript-resolvers"],

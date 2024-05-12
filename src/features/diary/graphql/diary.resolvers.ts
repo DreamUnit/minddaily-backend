@@ -1,23 +1,26 @@
-import { IDiary } from "../diary.types";
-import {
-    IDelete,
-    IPagination,
-    IRead,
-    IReadMany,
-} from "../../common/common.types";
 import { DateTime } from "luxon";
 import {
     diaryModel,
     diaryNotesModel,
     logger,
 } from "../../../config/dataServices.service";
+import {
+    DeleteResponse,
+    MutationCreateDiaryArgs,
+    MutationDeleteDiaryArgs,
+    MutationUpdateDiaryArgs,
+    QueryReadDiariesArgs,
+    QueryReadDiaryByIdArgs,
+    ReadDiariesResponse,
+    ReadDiaryResponse,
+} from "../../../__generated__/types";
 
 export const diaryResolvers = {
     Query: {
         readDiaries: async (
             _,
-            { take, skip }: IPagination
-        ): Promise<IReadMany<IDiary>> => {
+            { take, skip }: QueryReadDiariesArgs
+        ): Promise<ReadDiariesResponse> => {
             try {
                 const data = await diaryModel.readMany(take, skip);
                 return {
@@ -38,7 +41,10 @@ export const diaryResolvers = {
             }
         },
 
-        readDiaryById: async (_, { id }): Promise<IRead<IDiary>> => {
+        readDiaryById: async (
+            _,
+            { id }: QueryReadDiaryByIdArgs
+        ): Promise<ReadDiaryResponse> => {
             try {
                 const data = await diaryModel.readById(id);
                 return {
@@ -59,7 +65,10 @@ export const diaryResolvers = {
     },
 
     Mutation: {
-        createDiary: async (_, { userId, title }): Promise<IRead<IDiary>> => {
+        createDiary: async (
+            _,
+            { userId, title }: MutationCreateDiaryArgs
+        ): Promise<ReadDiaryResponse> => {
             try {
                 const data = await diaryModel.create({
                     createdDate: DateTime.utc(),
@@ -86,8 +95,8 @@ export const diaryResolvers = {
 
         updateDiary: async (
             _,
-            { id, userId, title }
-        ): Promise<IRead<IDiary>> => {
+            { id, userId, title }: MutationUpdateDiaryArgs
+        ): Promise<ReadDiaryResponse> => {
             try {
                 const data = await diaryModel.update(id, {
                     userId: userId,
@@ -109,9 +118,11 @@ export const diaryResolvers = {
             }
         },
 
-        deleteDiary: async (_, { id }): Promise<IDelete> => {
+        deleteDiary: async (
+            _,
+            { id }: MutationDeleteDiaryArgs
+        ): Promise<DeleteResponse> => {
             try {
-                // type the input.
                 const data = await diaryModel.delete(id);
                 return {
                     code: 200,

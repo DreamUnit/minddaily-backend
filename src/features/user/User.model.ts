@@ -1,16 +1,19 @@
 import { UsersSchemaModel } from "./User.schema";
 import { DateTime } from "luxon";
-import { ICreateUserRequest, IUpdateUserRequest, IUser } from "./user.types";
-import { IFilter } from "./user.types";
 import { IDataSource } from "../../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
 import { AbstractModel } from "../common/AbstractModel.model";
-import { IFilterOpts } from "../common/common.types";
+import {
+    MutationCreateUserArgs,
+    MutationUpdateUserArgs,
+    User,
+    UserFilterOpts,
+} from "../../__generated__/types";
 
 export class UserModel extends AbstractModel<
-    ICreateUserRequest,
-    IUpdateUserRequest,
-    IUser
+    MutationCreateUserArgs,
+    MutationUpdateUserArgs,
+    User
 > {
     private readonly source: string = "users";
     private readonly model = UsersSchemaModel;
@@ -19,12 +22,19 @@ export class UserModel extends AbstractModel<
         super();
     }
 
-    async create(inputData: ICreateUserRequest): Promise<IUser> {
-        const data = await this.dataSource.write<ICreateUserRequest, IUser>(
+    async create(inputData: MutationCreateUserArgs): Promise<User> {
+        const data = await this.dataSource.write<Partial<User>, User>(
             this.source,
             this.model,
             {
                 data: {
+                    createdDate: DateTime.utc(),
+                    updatedDate: null,
+                    version: 1,
+                    permissions: [],
+                    active: true,
+                    points: 0,
+                    locale: `en-gb`,
                     ...inputData,
                 },
             }
@@ -36,13 +46,16 @@ export class UserModel extends AbstractModel<
         return null;
     }
 
-    async update<Data>(id: string | number, updatedData: Data): Promise<IUser> {
+    async update(
+        id: number | string,
+        updatedData: MutationUpdateUserArgs
+    ): Promise<User> {
         const updatedDate = DateTime.utc();
 
         const updatedDataResponse = await this.dataSource.update<
-            Data,
+            User,
             {},
-            IUser
+            User
         >(this.source, {
             id: id,
             data: { ...updatedData, updatedDate },
@@ -61,8 +74,8 @@ export class UserModel extends AbstractModel<
         return deleteResponse;
     }
 
-    async readById(id: string): Promise<IUser | null> {
-        const data = await this.dataSource.readById<IUser>(this.source, id);
+    async readById(id: string | number): Promise<User | null> {
+        const data = await this.dataSource.readById<User>(this.source, id);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -70,9 +83,9 @@ export class UserModel extends AbstractModel<
         return null;
     }
 
-    async readByField(filter: IFilterOpts): Promise<IUser[] | null> {
+    async readByField(filter: UserFilterOpts): Promise<User[] | null> {
         const value = filter.stringValue || filter.intValue;
-        let queryResult = await this.dataSource.readByField<IUser>(
+        let queryResult = await this.dataSource.readByField<User>(
             this.source,
             filter.field,
             value
@@ -83,11 +96,14 @@ export class UserModel extends AbstractModel<
     async readMany(
         take: number,
         skip: number
-    ): Promise<IReadManyAndCountResult<IUser>> {
-        const data = await this.dataSource.read<IFilter, IUser>(this.source, {
-            take: take,
-            skip: skip,
-        });
+    ): Promise<IReadManyAndCountResult<User>> {
+        const data = await this.dataSource.read<UserFilterOpts, User>(
+            this.source,
+            {
+                take: take,
+                skip: skip,
+            }
+        );
         return data;
     }
 }

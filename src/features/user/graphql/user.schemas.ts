@@ -1,8 +1,6 @@
 import gql from "graphql-tag";
 
 export const userTypeDefs = gql`
-    scalar DateTime
-
     input UserFilterOpts {
         field: String!
         stringValue: String
@@ -11,7 +9,6 @@ export const userTypeDefs = gql`
 
     type Query {
         readUsers(take: Int!, skip: Int!): ReadUsersResponse
-        # readUsersByField(filter: UserFilterOpts!): ReadUsersResponse
         readUserById(id: ID!): ReadUserResponse
     }
 
@@ -20,9 +17,10 @@ export const userTypeDefs = gql`
             authUserId: ID!
             email: String!
             name: String!
+            locale: String!
         ): ReadUserResponse
         updateUser(
-            id: ID!
+            id: ID
             name: String
             active: Boolean
             email: String
@@ -30,7 +28,7 @@ export const userTypeDefs = gql`
             locale: String
             permissions: [String]
         ): ReadUserResponse
-        deleteUser(id: ID!): ReadUserResponse
+        deleteUser(id: ID!): DeleteResponse
     }
 
     type User {
@@ -62,5 +60,11 @@ export const userTypeDefs = gql`
         message: String
         data: [User]
         count: Int
+    }
+
+    type DeleteResponse {
+        code: Int!
+        success: Boolean!
+        message: String
     }
 `;

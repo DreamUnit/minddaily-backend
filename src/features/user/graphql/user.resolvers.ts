@@ -1,24 +1,27 @@
-import {
-    IDelete,
-    IPagination,
-    IRead,
-    IReadMany,
-} from "../../common/common.types";
 import { DateTime } from "luxon";
-import { IUser } from "../user.types";
 import { IUpdateUserRequest } from "../user.types";
 import {
     userModel,
     diaryModel,
     logger,
 } from "../../../config/dataServices.service";
+import {
+    DeleteResponse,
+    MutationCreateUserArgs,
+    MutationDeleteUserArgs,
+    MutationUpdateUserArgs,
+    QueryReadUserByIdArgs,
+    QueryReadUsersArgs,
+    ReadUserResponse,
+    ReadUsersResponse,
+} from "../../../__generated__/types";
 
 export const userResolvers = {
     Query: {
         readUsers: async (
             _,
-            { take, skip }: IPagination
-        ): Promise<IReadMany<IUser>> => {
+            { take, skip }: QueryReadUsersArgs
+        ): Promise<ReadUsersResponse> => {
             try {
                 const data = await userModel.readMany(take, skip);
                 return {
@@ -39,7 +42,10 @@ export const userResolvers = {
             }
         },
 
-        readUserById: async (_, { id }): Promise<IRead<IUser>> => {
+        readUserById: async (
+            _,
+            { id }: QueryReadUserByIdArgs
+        ): Promise<ReadUserResponse> => {
             try {
                 const data = await userModel.readById(id);
                 return {
@@ -62,19 +68,14 @@ export const userResolvers = {
     Mutation: {
         createUser: async (
             _,
-            { authUserId, name, email }
-        ): Promise<IRead<IUser>> => {
+            { authUserId, name, email, locale }: MutationCreateUserArgs
+        ): Promise<ReadUserResponse> => {
             try {
                 const data = await userModel.create({
-                    createdDate: DateTime.utc(),
-                    version: 1,
-                    permissions: [],
-                    active: true,
-                    points: 0,
                     authUserId: authUserId,
                     name: name,
                     email: email,
-                    locale: `en-gb`,
+                    locale,
                 });
 
                 return {
@@ -95,16 +96,24 @@ export const userResolvers = {
 
         updateUser: async (
             _,
-            { id, name, email, active, points, locale, permissions }
-        ): Promise<IRead<IUser>> => {
+            {
+                id,
+                name,
+                email,
+                active,
+                points,
+                locale,
+                permissions,
+            }: MutationUpdateUserArgs
+        ): Promise<ReadUserResponse> => {
             try {
-                const data = await userModel.update<IUpdateUserRequest>(id, {
-                    name: name,
-                    email: email,
-                    active: active,
-                    points: points,
-                    locale: locale,
-                    permissions: permissions,
+                const data = await userModel.update(id, {
+                    name,
+                    email,
+                    active,
+                    points,
+                    locale,
+                    permissions,
                 });
                 return {
                     code: 200,
@@ -122,7 +131,10 @@ export const userResolvers = {
             }
         },
 
-        deleteUser: async (_, { id }): Promise<IDelete> => {
+        deleteUser: async (
+            _,
+            { id }: MutationDeleteUserArgs
+        ): Promise<DeleteResponse> => {
             try {
                 const data = await userModel.delete(id);
                 return {

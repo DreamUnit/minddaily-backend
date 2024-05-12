@@ -19,11 +19,6 @@ const googleStrategy = new GoogleStrategy(
                 name: `${profile.name.givenName} ${profile.name.familyName}`,
                 email: profile.emails[0].value,
                 locale: profile._json.locale,
-                createdDate: DateTime.utc(),
-                version: 1,
-                permissions: ["readDiaries", "readDiaryNotes"],
-                active: true,
-                points: 0,
             });
             return cb(null, newUser);
         }
