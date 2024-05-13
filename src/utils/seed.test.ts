@@ -1,13 +1,9 @@
-import {
-    dataSource,
-    diaryModel,
-    diaryNotesModel,
-    logger,
-    userModel,
-} from "../config/dataServices.service";
-
+import { DataManager } from "../config/dataServices.service";
 import { seedScript } from "./seed.util";
 import { DateTime } from "luxon";
+
+const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
+    DataManager.getInstance();
 
 jest.mock("../config/dataServices.service", () => {
     return {

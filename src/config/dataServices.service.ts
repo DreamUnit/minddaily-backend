@@ -19,17 +19,46 @@ dotenv.config({
     ),
 });
 
-// Logger instantiation
-export const logger: ILogger = new Logger(new WinstonLogger());
+export class DataManager {
+    static instance = null;
+    logger: Logger;
+    dataSource: MongodbDataSource;
+    userModel: UserModel;
+    diaryModel: DiaryModel;
+    diaryNotesModel: DiaryNotesModel;
+    authController: AuthController;
 
-// DataSource instantiation
-export const dataSource = new MongodbDataSource(
-    process.env.MONGODB_DSN,
-    logger
-);
+    constructor() {
+        if (DataManager.instance) {
+            return DataManager.instance;
+        }
+        this.initDataClasses();
+        DataManager.instance = this;
+    }
 
-// Model instantiations
-export const authController = new AuthController();
-export const userModel = new UserModel(dataSource);
-export const diaryModel = new DiaryModel(dataSource);
-export const diaryNotesModel = new DiaryNotesModel(dataSource);
+    initDataClasses() {
+        // Logger instantiation
+        this.logger = new Logger(new WinstonLogger());
+
+        // DataSource instantiation
+        this.dataSource = new MongodbDataSource(
+            process.env.MONGODB_DSN,
+            this.logger
+        );
+
+        // Model instantiations
+        this.userModel = new UserModel(this.dataSource);
+        this.diaryModel = new DiaryModel(this.dataSource);
+        this.diaryNotesModel = new DiaryNotesModel(this.dataSource);
+
+        // Controller instantiation
+        this.authController = new AuthController(this.logger);
+    }
+
+    static getInstance() {
+        if (!DataManager.instance) {
+            DataManager.instance = new DataManager();
+        }
+        return DataManager.instance;
+    }
+}

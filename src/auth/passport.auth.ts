@@ -1,6 +1,7 @@
 import GoogleStrategy from "passport-google-oauth20";
-import { userModel } from "../config/dataServices.service";
-import { DateTime } from "luxon";
+import { DataManager } from "../config/dataServices.service";
+
+const { userModel } = DataManager.getInstance();
 
 const googleStrategy = new GoogleStrategy(
     {

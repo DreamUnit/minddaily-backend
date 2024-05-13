@@ -1,11 +1,13 @@
 import {
     MutationCreateUserArgs,
     MutationUpdateUserArgs,
+    User,
 } from "../../__generated__/types";
 import { MockDataSource } from "../../__mocks__/MockDataSource";
 import { UserModel } from "./User.model";
 import { UsersSchemaModel } from "./User.schema";
 import { DateTime } from "luxon";
+
 describe("UserModel", () => {
     let userModel: UserModel;
     let mockDataSource: MockDataSource;
@@ -26,6 +28,17 @@ describe("UserModel", () => {
             email: "john@example.com",
             locale: "en-US",
         };
+        const expectedData: User = {
+            authUserId: "authUserId123",
+            name: "John Doe",
+            email: "john@example.com",
+            locale: "en-US",
+            createdDate: DateTime.now(),
+            id: "1",
+            permissions: [],
+            version: 0,
+            active: true,
+        };
         mockDataSource.write.mockResolvedValue({
             id: "123example",
             ...userData,
@@ -41,7 +54,7 @@ describe("UserModel", () => {
         );
         expect(result).toEqual({
             id: "123example",
-            ...userData,
+            ...expectedData,
             updatedDate: expect.any(DateTime),
         });
     });

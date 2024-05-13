@@ -1,10 +1,7 @@
-import {
-    userModel,
-    diaryModel,
-    diaryNotesModel,
-    dataSource,
-    logger,
-} from "../config/dataServices.service";
+import { DataManager } from "../config/dataServices.service";
+
+const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
+    DataManager.getInstance();
 
 const firstNames = [
     "John",
