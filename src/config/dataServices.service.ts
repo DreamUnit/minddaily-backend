@@ -20,7 +20,7 @@ dotenv.config({
 });
 
 export class DataManager {
-    static instance = null;
+    static instance: DataManager | null = null;
     logger: Logger;
     dataSource: MongodbDataSource;
     userModel: UserModel;

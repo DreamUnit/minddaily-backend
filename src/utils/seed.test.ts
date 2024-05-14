@@ -1,40 +1,63 @@
 import { DataManager } from "../config/dataServices.service";
-import { seedScript } from "./seed.util";
+import { seedMongoDb, seedScript } from "./seed.util";
 import { DateTime } from "luxon";
 
 const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
     DataManager.getInstance();
-
+// jest.mock("luxon", () => {
+//     const actualLuxon = jest.requireActual("luxon");
+//     return {
+//         ...actualLuxon,
+//         DateTime: {
+//             ...actualLuxon.DateTime,
+//             utc: jest.fn(() =>
+//                 actualLuxon.DateTime.fromISO("2024-05-13T19:34:40.955Z")
+//             ),
+//         },
+//     };
+// });
+const testDate = DateTime.utc();
 jest.mock("../config/dataServices.service", () => {
     return {
-        dataSource: {
-            connect: jest.fn().mockResolvedValue(true),
-            close: jest.fn().mockResolvedValue(true),
-        },
-
-        userModel: {
-            create: jest
-                .fn()
-                .mockImplementation(userData =>
-                    Promise.resolve({ id: "user123", ...userData })
-                ),
-        },
-        diaryModel: {
-            create: jest
-                .fn()
-                .mockImplementation(diaryData =>
-                    Promise.resolve({ id: "diary123", ...diaryData })
-                ),
-        },
-        diaryNotesModel: {
-            create: jest
-                .fn()
-                .mockImplementation(diaryNoteData =>
-                    Promise.resolve({ id: "diaryNote123", ...diaryNoteData })
-                ),
-        },
-        logger: {
-            info: jest.fn(),
+        DataManager: {
+            getInstance: jest.fn(() => ({
+                dataSource: {
+                    connect: jest.fn().mockResolvedValue(true),
+                    close: jest.fn().mockResolvedValue(true),
+                },
+                userModel: {
+                    create: jest
+                        .fn()
+                        .mockImplementation(userData =>
+                            Promise.resolve({ id: "user123", ...userData })
+                        ),
+                },
+                diaryModel: {
+                    create: jest.fn().mockImplementation(diaryData =>
+                        Promise.resolve({
+                            id: "diary123",
+                            ...diaryData,
+                            createdDate: testDate,
+                            version: 1,
+                        })
+                    ),
+                },
+                diaryNotesModel: {
+                    create: jest.fn().mockImplementation(diaryNoteData =>
+                        Promise.resolve({
+                            id: "diaryNote123",
+                            ...diaryNoteData,
+                            createdDate: testDate,
+                            version: 1,
+                        })
+                    ),
+                },
+                logger: {
+                    info: jest.fn(),
+                    warning: jest.fn(),
+                    error: jest.fn(),
+                },
+            })),
         },
     };
 });
@@ -53,7 +76,6 @@ describe("SeedMongoDb script", () => {
     });
 
     it("should seed the database with the correct data", async () => {
-        const testDate = DateTime.utc();
         const user = await userModel.create({
             authUserId: `abcdef`,
             name: `Jane Doe`,
@@ -63,7 +85,7 @@ describe("SeedMongoDb script", () => {
         expect(user).toHaveProperty("authUserId", "abcdef");
         expect(user).toHaveProperty("name", "Jane Doe");
         expect(user).toHaveProperty("email", "janedoe1@hotmail.com");
-        expect(user).toHaveProperty("locale", "EU");
+        expect(user).toHaveProperty("locale", "en-GB");
 
         const diary = await diaryModel.create({
             userId: "exampleuserid123",

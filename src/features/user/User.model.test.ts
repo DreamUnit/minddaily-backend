@@ -28,35 +28,29 @@ describe("UserModel", () => {
             email: "john@example.com",
             locale: "en-US",
         };
+
         const expectedData: User = {
-            authUserId: "authUserId123",
-            name: "John Doe",
-            email: "john@example.com",
-            locale: "en-US",
-            createdDate: DateTime.now(),
-            id: "1",
-            permissions: [],
-            version: 0,
-            active: true,
-        };
-        mockDataSource.write.mockResolvedValue({
-            id: "123example",
             ...userData,
-            updatedDate: DateTime.now(),
-        });
+            createdDate: DateTime.now().toISO(),
+            updatedDate: null,
+            id: "123example",
+            permissions: [],
+            version: 1,
+            active: true,
+            points: 0,
+        };
+
+        mockDataSource.write.mockResolvedValue(expectedData);
 
         const result = await userModel.create(userData);
 
         expect(mockDataSource.write).toHaveBeenCalledWith(
             "users",
             UsersSchemaModel,
-            { data: userData }
+            { data: expect.objectContaining(userData) }
         );
-        expect(result).toEqual({
-            id: "123example",
-            ...expectedData,
-            updatedDate: expect.any(DateTime),
-        });
+
+        expect(result).toEqual(expectedData);
     });
 
     it("should update a user and return updated data", async () => {
