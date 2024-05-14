@@ -27,6 +27,7 @@ export class DiaryModel extends AbstractModel<
             this.model,
             {
                 data: {
+                    version: 1,
                     ...inputData,
                 },
             }

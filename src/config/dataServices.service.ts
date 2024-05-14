@@ -3,12 +3,10 @@ import path from "path";
 import { MongodbDataSource } from "../dataSources/MongodbDataSource.datasource";
 import { UserModel } from "../features/user/User.model";
 import { DiaryNotesModel } from "../features/diary-notes/DiaryNotes.model";
-import { ILogger } from "../utils/Logger.types";
 import { WinstonLogger } from "../utils/WinstonLogger.util";
 import { Logger } from "../utils/Logger.util";
 import AuthController from "../controllers/Auth.controller";
 import { DiaryModel } from "../features/index.model";
-import express from "express";
 
 dotenv.config({
     path: path.resolve(
@@ -18,15 +16,20 @@ dotenv.config({
             : "../../development.env"
     ),
 });
-
+/**
+ *  We are using the singleton pattern here to instantiate our data classes when we need them
+ * if there is already an instance we retrieve the already running instance of our data
+ * class thus encapsulating our data class instantiation and not instantiating them in
+ * global scope
+ */
 export class DataManager {
     static instance: DataManager | null = null;
-    logger: Logger;
-    dataSource: MongodbDataSource;
-    userModel: UserModel;
-    diaryModel: DiaryModel;
-    diaryNotesModel: DiaryNotesModel;
-    authController: AuthController;
+    public logger: Logger;
+    public dataSource: MongodbDataSource;
+    public userModel: UserModel;
+    public diaryModel: DiaryModel;
+    public diaryNotesModel: DiaryNotesModel;
+    public authController: AuthController;
 
     constructor() {
         if (DataManager.instance) {
