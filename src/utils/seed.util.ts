@@ -1,10 +1,8 @@
-import {
-    userModel,
-    diaryModel,
-    diaryNotesModel,
-    dataSource,
-    logger,
-} from "../config/dataServices.service";
+import { Diary, User } from "../__generated__/types";
+import { DataManager } from "../config/dataServices.service";
+
+const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
+    DataManager.getInstance();
 
 const firstNames = [
     "John",
@@ -63,14 +61,14 @@ export async function seedMongoDb() {
             random = Math.floor(Math.random() * 7);
             randomV2 = Math.floor(Math.random() * 7);
 
-            const user = await userModel.create({
+            const user: User = await userModel.create({
                 authUserId: `abcdef${i}`,
                 name: `${firstNames[random]} ${foreNames[randomV2]}`,
                 email: `${firstNames[random]} ${foreNames[randomV2]}${i}@hotmail.com`,
-                locale: `EU`,
+                locale: `en-GB`,
             });
 
-            const diary = await diaryModel.create({
+            const diary: Diary = await diaryModel.create({
                 userId: user.id,
                 title: diaryTitles[random],
             });

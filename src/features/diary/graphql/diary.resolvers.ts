@@ -1,8 +1,4 @@
-import {
-    diaryModel,
-    diaryNotesModel,
-    logger,
-} from "../../../config/dataServices.service";
+import { DataManager } from "../../../config/dataServices.service";
 import {
     DeleteResponse,
     MutationCreateDiaryArgs,
@@ -13,6 +9,8 @@ import {
     ReadDiariesResponse,
     ReadDiaryResponse,
 } from "../../../__generated__/types";
+
+const { diaryModel, diaryNotesModel, logger } = DataManager.getInstance();
 
 export const diaryResolvers = {
     Query: {

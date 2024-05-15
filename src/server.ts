@@ -1,10 +1,11 @@
 import { DataSourceContext } from "./context";
 import { expressMiddleware } from "@apollo/server/express4";
 import routes from "./routes/index";
-import { dataSource, logger } from "./config/dataServices.service";
+import { DataManager } from "./config/dataServices.service";
 import { app, httpServer, apolloServer } from "./app";
 
 export async function startServer() {
+    const { logger, dataSource } = DataManager.getInstance();
     await dataSource.connect();
     await apolloServer.start();
     app.use(

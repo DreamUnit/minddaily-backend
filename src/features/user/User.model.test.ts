@@ -1,11 +1,13 @@
 import {
     MutationCreateUserArgs,
     MutationUpdateUserArgs,
+    User,
 } from "../../__generated__/types";
 import { MockDataSource } from "../../__mocks__/MockDataSource";
 import { UserModel } from "./User.model";
 import { UsersSchemaModel } from "./User.schema";
 import { DateTime } from "luxon";
+
 describe("UserModel", () => {
     let userModel: UserModel;
     let mockDataSource: MockDataSource;
@@ -26,24 +28,29 @@ describe("UserModel", () => {
             email: "john@example.com",
             locale: "en-US",
         };
-        mockDataSource.write.mockResolvedValue({
-            id: "123example",
+
+        const expectedData: User = {
             ...userData,
-            updatedDate: DateTime.now(),
-        });
+            createdDate: DateTime.now().toISO(),
+            updatedDate: null,
+            id: "123example",
+            permissions: [],
+            version: 1,
+            active: true,
+            points: 0,
+        };
+
+        mockDataSource.write.mockResolvedValue(expectedData);
 
         const result = await userModel.create(userData);
 
         expect(mockDataSource.write).toHaveBeenCalledWith(
             "users",
             UsersSchemaModel,
-            { data: userData }
+            { data: expect.objectContaining(userData) }
         );
-        expect(result).toEqual({
-            id: "123example",
-            ...userData,
-            updatedDate: expect.any(DateTime),
-        });
+
+        expect(result).toEqual(expectedData);
     });
 
     it("should update a user and return updated data", async () => {

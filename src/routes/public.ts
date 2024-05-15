@@ -1,9 +1,9 @@
 import express from "express";
 import passport from "passport";
-import { authController } from "../config/dataServices.service";
+import { DataManager } from "../config/dataServices.service";
 
+const { authController } = DataManager.getInstance();
 const router = express.Router();
-
 router.get(
     "/auth/google",
     passport.authenticate("google", { scope: ["profile", "email"] })
