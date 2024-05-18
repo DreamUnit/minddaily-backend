@@ -11,6 +11,34 @@ import { DateTime } from "luxon";
 describe("UserModel", () => {
     let userModel: UserModel;
     let mockDataSource: MockDataSource;
+    const mockDate = DateTime.now().toISO();
+    const mockUpdatedDate = DateTime.now().toISO();
+    const expectedData: User = {
+        authUserId: "authUserId123",
+        name: "John Doe",
+        email: "john@example.com",
+        locale: "en-US",
+        createdDate: mockDate,
+        updatedDate: mockDate,
+        id: "123example",
+        permissions: [],
+        version: 1,
+        active: true,
+        points: 0,
+    };
+    const updatedUser: User = {
+        authUserId: "authUserId123",
+        name: "Updated Name",
+        email: "john@example.com",
+        locale: "en-US",
+        createdDate: mockDate,
+        updatedDate: mockUpdatedDate,
+        id: "123example",
+        permissions: [],
+        version: 2,
+        active: true,
+        points: 0,
+    };
 
     beforeEach(() => {
         mockDataSource = new MockDataSource();
@@ -29,17 +57,6 @@ describe("UserModel", () => {
             locale: "en-US",
         };
 
-        const expectedData: User = {
-            ...userData,
-            createdDate: DateTime.now().toISO(),
-            updatedDate: null,
-            id: "123example",
-            permissions: [],
-            version: 1,
-            active: true,
-            points: 0,
-        };
-
         mockDataSource.write.mockResolvedValue(expectedData);
 
         const result = await userModel.create(userData);
@@ -54,44 +71,45 @@ describe("UserModel", () => {
     });
 
     it("should update a user and return updated data", async () => {
-        const mockUpdateData = {
+        const mockUpdateData: MutationUpdateUserArgs = {
             id: "123",
             name: "Updated Name",
         };
-        const expectedUser: MutationUpdateUserArgs = {
-            ...mockUpdateData,
-        };
-        mockDataSource.update.mockResolvedValue(expectedUser);
 
-        const result = await userModel.update("123", mockUpdateData);
+        mockDataSource.update.mockResolvedValue(updatedUser);
+
+        const result = await userModel.update("123example", mockUpdateData);
 
         expect(mockDataSource.update).toHaveBeenCalledWith("users", {
-            id: "123",
-            data: { ...mockUpdateData, updatedDate: DateTime.utc() },
+            id: "123example",
+            data: mockUpdateData,
         });
-        expect(result).toEqual(expectedUser);
+        expect(result).toEqual(updatedUser);
     });
 
     it("should delete a user by id and return true", async () => {
         mockDataSource.deleteById.mockResolvedValue(true);
 
-        const result = await userModel.delete("123");
+        const result = await userModel.delete("123example");
 
         expect(mockDataSource.deleteById).toHaveBeenCalledWith(
             "users",
             UsersSchemaModel,
-            { id: "123" }
+            { id: "123example" }
         );
         expect(result).toBe(true);
     });
 
     it("should retrieve a user by id if user exists", async () => {
-        const expectedUser = { id: "123", name: "John Doe" };
+        const expectedUser = { id: "123example", name: "John Doe" };
         mockDataSource.readById.mockResolvedValue(expectedUser);
 
-        const result = await userModel.readById("123");
+        const result = await userModel.readById("123example");
 
-        expect(mockDataSource.readById).toHaveBeenCalledWith("users", "123");
+        expect(mockDataSource.readById).toHaveBeenCalledWith(
+            "users",
+            "123example"
+        );
         expect(result).toEqual(expectedUser);
     });
 
@@ -104,7 +122,7 @@ describe("UserModel", () => {
     });
 
     it("should retrieve users by a specific field", async () => {
-        const users = [{ id: "123", name: "John Doe" }];
+        const users = [{ id: "123example", name: "John Doe" }];
         mockDataSource.readByField.mockResolvedValue(users);
 
         const result = await userModel.readByField({

@@ -6,8 +6,8 @@ import {
 } from "../dataSources/DataSource.types";
 
 export class MockDataSource {
-    connect = jest.fn();
-    close = jest.fn();
+    connect = jest.fn().mockResolvedValue(true);
+    close = jest.fn().mockResolvedValue(true);
 
     write = jest.fn<any, any>(
         (source: string, schema: any, opts: IWriteOpts<any>) =>

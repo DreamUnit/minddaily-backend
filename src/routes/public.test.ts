@@ -1,8 +1,8 @@
 import request from "supertest";
 import { app } from "../app";
-import { DataManager } from "../config/dataServices.service";
+import { DatasourceManager } from "../config/DatasourceManager.service";
 
-const { dataSource } = DataManager.getInstance();
+const { dataSource } = DatasourceManager.getInstance();
 
 describe("GET /health", () => {
     it("should return a status of 200 and a success message", async () => {

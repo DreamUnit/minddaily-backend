@@ -1,8 +1,9 @@
 import { Diary, User } from "../__generated__/types";
-import { DataManager } from "../config/dataServices.service";
+import { DatasourceManager } from "../config/DatasourceManager.service";
+import models from "../features/index.model";
 
-const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
-    DataManager.getInstance();
+const { dataSource, logger } = DatasourceManager.getInstance();
+const { userModel, diaryModel, diaryNotesModel } = models;
 
 const firstNames = [
     "John",

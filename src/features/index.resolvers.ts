@@ -1,11 +1,25 @@
-import { diaryResolvers } from "./diary/graphql/diary.resolvers";
-import { diaryNotesResolvers } from "./diary-notes/graphql/diaryNotes.resolvers";
-import { userResolvers } from "./user/graphql/user.resolvers";
-import { commonTypeDefs } from "./common/common.schema";
+import { DiaryResolver } from "./diary/graphql/diary.resolvers";
+import { DiaryNotesResolver } from "./diary-notes/graphql/diaryNotes.resolvers";
+import { UserResolver } from "./user/graphql/user.resolvers";
+import { DatasourceManager } from "../config/DatasourceManager.service";
+import models from "./index.model";
 
-export const resolvers = [
-    // commonTypeDefs,
-    userResolvers,
-    diaryResolvers,
-    diaryNotesResolvers,
-];
+const { logger } = DatasourceManager.getInstance();
+const { userModel, diaryModel, diaryNotesModel } = models;
+
+const userResolvers = new UserResolver(
+    userModel,
+    diaryModel,
+    logger
+).getResolvers();
+
+const diaryResolvers = new DiaryResolver(
+    diaryModel,
+    diaryNotesModel,
+    logger
+).getResolvers();
+const diaryNoteResolvers = new DiaryNotesResolver(
+    diaryNotesModel
+).getResolvers();
+
+export const resolvers = [userResolvers, diaryResolvers, diaryNoteResolvers];

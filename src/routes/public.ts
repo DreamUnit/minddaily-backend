@@ -1,8 +1,7 @@
 import express from "express";
 import passport from "passport";
-import { DataManager } from "../config/dataServices.service";
+import authController from "../controllers/index.controller";
 
-const { authController } = DataManager.getInstance();
 const router = express.Router();
 router.get(
     "/auth/google",
@@ -19,7 +18,6 @@ router.get(
 );
 
 router.get("/health", (req, res) => {
-    console.log("I have been called");
     res.status(200).json({
         status: "success",
         message: "Health check passed",

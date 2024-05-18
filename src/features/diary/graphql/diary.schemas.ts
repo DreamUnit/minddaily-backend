@@ -18,7 +18,7 @@ export const diaryTypeDefs = gql`
     type Mutation {
         createDiary(userId: ID!, title: String!): ReadDiaryResponse
         updateDiary(id: ID!, userId: String, title: String): ReadDiaryResponse
-        deleteDiary(id: ID!): ReadDiaryResponse
+        deleteDiary(id: ID!): DeleteResponse
     }
 
     type Diary {

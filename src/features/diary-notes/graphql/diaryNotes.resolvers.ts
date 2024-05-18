@@ -1,25 +1,31 @@
-import { DataManager } from "../../../config/dataServices.service";
 import {
     DeleteResponse,
     MutationCreateDiaryNoteArgs,
     MutationDeleteDiaryNoteArgs,
+    MutationResolvers,
     MutationUpdateDiaryNoteArgs,
     QueryReadDiaryNoteByIdArgs,
     QueryReadDiaryNotesArgs,
+    QueryResolvers,
     ReadDiaryNoteResponse,
     ReadDiaryNotesResponse,
 } from "../../../__generated__/types";
+import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
+import { DiaryNotesModel } from "../DiaryNotes.model";
 
-const { diaryNotesModel } = DataManager.getInstance();
-
-export const diaryNotesResolvers = {
-    Query: {
+export class DiaryNotesResolver extends AbstractResolver {
+    private readonly diaryNotesModel: DiaryNotesModel;
+    constructor(diaryNotesModel: DiaryNotesModel) {
+        super();
+        this.diaryNotesModel = diaryNotesModel;
+    }
+    private query: QueryResolvers = {
         readDiaryNotes: async (
             _,
             { take, skip }: QueryReadDiaryNotesArgs
         ): Promise<ReadDiaryNotesResponse> => {
             try {
-                const { data, count } = await diaryNotesModel.readMany(
+                const { data, count } = await this.diaryNotesModel.readMany(
                     take,
                     skip
                 );
@@ -46,7 +52,7 @@ export const diaryNotesResolvers = {
             { id }: QueryReadDiaryNoteByIdArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await diaryNotesModel.readById(id);
+                const data = await this.diaryNotesModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -62,15 +68,15 @@ export const diaryNotesResolvers = {
                 };
             }
         },
-    },
+    };
 
-    Mutation: {
+    private mutation: MutationResolvers = {
         createDiaryNote: async (
             _,
             { title, text, diaryId }: MutationCreateDiaryNoteArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await diaryNotesModel.create({
+                const data = await this.diaryNotesModel.create({
                     title: title,
                     text: text,
                     diaryId: diaryId,
@@ -96,7 +102,7 @@ export const diaryNotesResolvers = {
             { id, title, text }: MutationUpdateDiaryNoteArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await diaryNotesModel.update(id, {
+                const data = await this.diaryNotesModel.update(id, {
                     id,
                     title: title,
                     text: text,
@@ -122,7 +128,7 @@ export const diaryNotesResolvers = {
             { id }: MutationDeleteDiaryNoteArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await diaryNotesModel.delete(id);
+                const data = await this.diaryNotesModel.delete(id);
                 return {
                     code: 200,
                     success: true,
@@ -136,5 +142,12 @@ export const diaryNotesResolvers = {
                 };
             }
         },
-    },
-};
+    };
+
+    public getResolvers() {
+        return {
+            Query: this.query,
+            Mutation: this.mutation,
+        };
+    }
+}

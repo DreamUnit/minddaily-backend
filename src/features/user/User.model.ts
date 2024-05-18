@@ -50,15 +50,13 @@ export class UserModel extends AbstractModel<
         id: number | string,
         updatedData: MutationUpdateUserArgs
     ): Promise<User> {
-        const updatedDate = DateTime.utc();
-
         const updatedDataResponse = await this.dataSource.update<
             User,
             {},
             User
         >(this.source, {
             id: id,
-            data: { ...updatedData, updatedDate },
+            data: { ...updatedData },
         });
         return updatedDataResponse;
     }
