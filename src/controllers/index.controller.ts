@@ -1,7 +1,7 @@
-import { DatasourceManager } from "../config/DatasourceManager.service";
+import { LoggerManager } from "../config/LoggerManager.service";
 import AuthController from "./Auth.controller";
 
-const { logger } = DatasourceManager.getInstance();
+const { logger } = LoggerManager.getInstance();
 const authController = new AuthController(logger);
 
 export default authController;

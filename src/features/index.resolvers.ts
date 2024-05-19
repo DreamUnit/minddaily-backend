@@ -1,10 +1,10 @@
 import { DiaryResolver } from "./diary/graphql/diary.resolvers";
 import { DiaryNotesResolver } from "./diary-notes/graphql/diaryNotes.resolvers";
 import { UserResolver } from "./user/graphql/user.resolvers";
-import { DatasourceManager } from "../config/DatasourceManager.service";
 import models from "./index.model";
+import { LoggerManager } from "../config/LoggerManager.service";
 
-const { logger } = DatasourceManager.getInstance();
+const { logger } = LoggerManager.getInstance();
 const { userModel, diaryModel, diaryNotesModel } = models;
 
 const userResolvers = new UserResolver(

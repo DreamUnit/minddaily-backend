@@ -36,20 +36,11 @@ jest.mock("../config/DatasourceManager.service", () => {
                 connect: jest.fn().mockResolvedValue(true),
                 close: jest.fn().mockResolvedValue(true),
             },
-            logger: {
-                info: jest.fn(),
-                warning: jest.fn(),
-                error: jest.fn(),
-            },
+
             getInstance: jest.fn(() => ({
                 dataSource: {
                     connect: jest.fn().mockResolvedValue(true),
                     close: jest.fn().mockResolvedValue(true),
-                },
-                logger: {
-                    info: jest.fn(),
-                    warning: jest.fn(),
-                    error: jest.fn(),
                 },
             })),
         },
