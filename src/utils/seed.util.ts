@@ -1,8 +1,11 @@
 import { Diary, User } from "../__generated__/types";
-import { DataManager } from "../config/dataServices.service";
+import { DatasourceManager } from "../config/DatasourceManager.service";
+import { LoggerManager } from "../config/LoggerManager.service";
+import models from "../features/index.model";
 
-const { dataSource, diaryModel, diaryNotesModel, logger, userModel } =
-    DataManager.getInstance();
+const { logger } = LoggerManager.getInstance();
+const { dataSource } = DatasourceManager.getInstance();
+const { userModel, diaryModel, diaryNotesModel } = models;
 
 const firstNames = [
     "John",
@@ -82,6 +85,7 @@ export async function seedMongoDb() {
 
         await dataSource.close();
     } catch (err) {
+        await dataSource.close();
         return logger.error(`failed to seed db with an error of ${err}`);
     }
     logger.info("completed seeding db");

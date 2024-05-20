@@ -72,7 +72,7 @@ export type Mutation = {
   createDiary?: Maybe<ReadDiaryResponse>;
   createDiaryNote?: Maybe<ReadDiaryNoteResponse>;
   createUser?: Maybe<ReadUserResponse>;
-  deleteDiary?: Maybe<ReadDiaryResponse>;
+  deleteDiary?: Maybe<DeleteResponse>;
   deleteDiaryNote?: Maybe<DeleteResponse>;
   deleteUser?: Maybe<DeleteResponse>;
   updateDiary?: Maybe<ReadDiaryResponse>;
@@ -423,7 +423,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createDiary?: Resolver<Maybe<ResolversTypes['ReadDiaryResponse']>, ParentType, ContextType, RequireFields<MutationCreateDiaryArgs, 'title' | 'userId'>>;
   createDiaryNote?: Resolver<Maybe<ResolversTypes['ReadDiaryNoteResponse']>, ParentType, ContextType, RequireFields<MutationCreateDiaryNoteArgs, 'diaryId' | 'text' | 'title'>>;
   createUser?: Resolver<Maybe<ResolversTypes['ReadUserResponse']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'authUserId' | 'email' | 'locale' | 'name'>>;
-  deleteDiary?: Resolver<Maybe<ResolversTypes['ReadDiaryResponse']>, ParentType, ContextType, RequireFields<MutationDeleteDiaryArgs, 'id'>>;
+  deleteDiary?: Resolver<Maybe<ResolversTypes['DeleteResponse']>, ParentType, ContextType, RequireFields<MutationDeleteDiaryArgs, 'id'>>;
   deleteDiaryNote?: Resolver<Maybe<ResolversTypes['DeleteResponse']>, ParentType, ContextType, RequireFields<MutationDeleteDiaryNoteArgs, 'id'>>;
   deleteUser?: Resolver<Maybe<ResolversTypes['DeleteResponse']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateDiary?: Resolver<Maybe<ResolversTypes['ReadDiaryResponse']>, ParentType, ContextType, RequireFields<MutationUpdateDiaryArgs, 'id'>>;

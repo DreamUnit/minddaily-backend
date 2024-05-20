@@ -1,11 +1,13 @@
 import { DataSourceContext } from "./context";
 import { expressMiddleware } from "@apollo/server/express4";
 import routes from "./routes/index";
-import { DataManager } from "./config/dataServices.service";
+import { DatasourceManager } from "./config/DatasourceManager.service";
 import { app, httpServer, apolloServer } from "./app";
+import { LoggerManager } from "./config/LoggerManager.service";
 
 export async function startServer() {
-    const { logger, dataSource } = DataManager.getInstance();
+    const { logger } = LoggerManager.getInstance();
+    const { dataSource } = DatasourceManager.getInstance();
     await dataSource.connect();
     await apolloServer.start();
     app.use(
@@ -13,9 +15,7 @@ export async function startServer() {
         expressMiddleware(apolloServer, {
             context: async ({ req }): Promise<DataSourceContext> => {
                 return {
-                    dataSources: {
-                        mongodbDataSource: dataSource,
-                    },
+                    dataSource: dataSource,
                 };
             },
         })

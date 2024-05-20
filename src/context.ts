@@ -1,8 +1,6 @@
-import { MongodbDataSource } from "./dataSources/MongodbDataSource.datasource";
+import { IDataSource } from "./dataSources/DataSource.datasource";
 
 export type DataSourceContext = {
     user?: string;
-    dataSources: {
-        mongodbDataSource: MongodbDataSource;
-    };
+    dataSource: IDataSource;
 };
