@@ -1,7 +1,7 @@
 import { IDataSource } from "./DataSource.datasource.js";
 
 import { ILogger } from "../utils/Logger.types.js";
-import mongoose, { Model } from "mongoose";
+import mongoose from "mongoose";
 import {
     IDeleteOpts,
     IReadOpts,
