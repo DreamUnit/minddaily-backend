@@ -4,13 +4,14 @@ import {
     MutationUpdateDiaryArgs,
 } from "../../__generated__/types";
 import { MockDataSource } from "../../__mocks__/MockDataSource";
-import { DiarySchemaModel } from "./Diary.schema";
 import { DiaryModel } from "./Diary.model";
 import { DateTime } from "luxon";
+import { MockRepository } from "../../__mocks__/MockRepository";
 
 describe("DiaryModel", () => {
     let diaryModel: DiaryModel;
     let mockDataSource: MockDataSource;
+    let mockRepository: MockRepository;
     const mockDate = DateTime.now().toISO();
     const mockUpdatedData = DateTime.now().toISO();
     const expectedDiary: Diary = {
@@ -33,7 +34,8 @@ describe("DiaryModel", () => {
     };
     beforeEach(() => {
         mockDataSource = new MockDataSource();
-        diaryModel = new DiaryModel(mockDataSource);
+        mockRepository = new MockRepository(mockDataSource);
+        diaryModel = new DiaryModel(mockRepository);
     });
 
     afterEach(() => {
@@ -46,14 +48,12 @@ describe("DiaryModel", () => {
             userId: "userId",
         };
 
-        mockDataSource.write.mockResolvedValue(expectedDiary);
+        mockRepository.create.mockResolvedValue(expectedDiary);
 
         const result = await diaryModel.create(diaryData);
 
-        expect(mockDataSource.write).toHaveBeenCalledWith(
-            "diaries",
-            DiarySchemaModel,
-            { data: expect.objectContaining(diaryData) }
+        expect(mockRepository.create).toHaveBeenCalledWith(
+            expect.objectContaining(diaryData)
         );
 
         expect(result).toEqual(expectedDiary);
@@ -66,44 +66,37 @@ describe("DiaryModel", () => {
             userId: "userId",
         };
 
-        mockDataSource.update.mockResolvedValue(updatedDiary);
+        mockRepository.update.mockResolvedValue(updatedDiary);
 
         const result = await diaryModel.update("exampleId", mockUpdateData);
 
-        expect(mockDataSource.update).toHaveBeenCalledWith("diaries", {
-            id: "exampleId",
-            data: mockUpdateData,
-        });
+        expect(mockRepository.update).toHaveBeenCalledWith(
+            "exampleId",
+            mockUpdateData
+        );
         expect(result).toEqual(updatedDiary);
     });
 
     it("should delete a diary  by id and return true", async () => {
-        mockDataSource.deleteById.mockResolvedValue(true);
+        mockRepository.deleteById.mockResolvedValue(true);
 
         const result = await diaryModel.delete("exampleId");
 
-        expect(mockDataSource.deleteById).toHaveBeenCalledWith(
-            "diaries",
-            DiarySchemaModel,
-            { id: "exampleId" }
-        );
+        expect(mockRepository.deleteById).toHaveBeenCalledWith("exampleId");
         expect(result).toBe(true);
     });
 
     it("should retrieve a diary  by id if diary  exists", async () => {
-        mockDataSource.readById.mockResolvedValue(expectedDiary);
+        mockRepository.readById.mockResolvedValue(expectedDiary);
 
         const result = await diaryModel.readById("exampleId");
 
-        expect(mockDataSource.readById).toHaveBeenCalledWith(
-            "diaries",
-            "exampleId"
-        );
+        expect(mockRepository.readById).toHaveBeenCalledWith("exampleId");
         expect(result).toEqual(expectedDiary);
     });
 
     it("should return null if no diary is found by id", async () => {
-        mockDataSource.readById.mockResolvedValue(null);
+        mockRepository.readById.mockResolvedValue(null);
 
         const result = await diaryModel.readById("404");
 
@@ -112,18 +105,17 @@ describe("DiaryModel", () => {
 
     it("should retrieve diary by a specific field", async () => {
         const expectedDiarys = [expectedDiary];
-        mockDataSource.readByField.mockResolvedValue(expectedDiarys);
+        mockRepository.readByField.mockResolvedValue(expectedDiarys);
 
         const result = await diaryModel.readByField({
             field: "title",
             stringValue: "example title",
         });
 
-        expect(mockDataSource.readByField).toHaveBeenCalledWith(
-            "diaries",
-            "title",
-            "example title"
-        );
+        expect(mockRepository.readByField).toHaveBeenCalledWith({
+            field: "title",
+            stringValue: "example title",
+        });
         expect(result).toEqual(expectedDiarys);
     });
 
@@ -133,11 +125,11 @@ describe("DiaryModel", () => {
             { id: "exampleId2", title: "example 2" },
         ];
         const expectedData = { data: expectedDiarys, count: 2 };
-        mockDataSource.read.mockResolvedValue(expectedData);
+        mockRepository.read.mockResolvedValue(expectedData);
 
         const result = await diaryModel.readMany(2, 0);
 
-        expect(mockDataSource.read).toHaveBeenCalledWith("diaries", {
+        expect(mockRepository.read).toHaveBeenCalledWith({
             take: 2,
             skip: 0,
         });

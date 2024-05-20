@@ -1,6 +1,6 @@
-import { DiaryResolver } from "./diary/graphql/diary.resolvers";
-import { DiaryNotesResolver } from "./diary-notes/graphql/diaryNotes.resolvers";
-import { UserResolver } from "./user/graphql/user.resolvers";
+import { DiaryResolver } from "./diary/graphql/Diary.resolvers";
+import { DiaryNotesResolver } from "./diary-notes/graphql/DiaryNotes.resolvers";
+import { UserResolver } from "./user/graphql/User.resolvers";
 import models from "./index.model";
 import { LoggerManager } from "../config/LoggerManager.service";
 

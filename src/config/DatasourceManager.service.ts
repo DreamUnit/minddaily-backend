@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 import path from "path";
 import { MongodbDataSource } from "../dataSources/MongodbDataSource.datasource";
-import { WinstonLogger } from "../utils/WinstonLogger.util";
-import { Logger } from "../utils/Logger.util";
 import { IDataSource } from "../dataSources/DataSource.datasource";
 import { LoggerManager } from "./LoggerManager.service";
 

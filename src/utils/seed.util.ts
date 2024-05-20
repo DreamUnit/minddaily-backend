@@ -85,6 +85,7 @@ export async function seedMongoDb() {
 
         await dataSource.close();
     } catch (err) {
+        await dataSource.close();
         return logger.error(`failed to seed db with an error of ${err}`);
     }
     logger.info("completed seeding db");
