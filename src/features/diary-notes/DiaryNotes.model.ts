@@ -1,7 +1,4 @@
-import { IDataSource } from "../../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
-import { DiaryNoteSchemaModel } from "./DiaryNote.schema";
-
 import { AbstractModel } from "../common/AbstractModel.model";
 import {
     DiaryFilterOpts,

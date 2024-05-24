@@ -80,7 +80,6 @@ describe("UserModel", () => {
         mockRepository.update.mockResolvedValue(updatedUser);
 
         const result = await userModel.update("123example", mockUpdateData);
-
         expect(mockRepository.update).toHaveBeenCalledWith(
             "123example",
             mockUpdateData

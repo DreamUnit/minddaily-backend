@@ -100,9 +100,16 @@ export class MongodbDataSource implements IDataSource {
 
     public async update<T, Query, R>(opts: IUpdateOpts<T, Query>): Promise<R> {
         const model = mongoose.model(opts.source);
+
+        const updateData = {
+            ...opts.data,
+            $currentDate: { updatedDate: true },
+        };
+
         const document = await model
-            .findByIdAndUpdate(opts.id, opts.data, { new: true })
+            .findByIdAndUpdate(opts.id, updateData, { new: true })
             .exec();
+
         return document;
     }
 

@@ -1,6 +1,4 @@
-import { UsersSchemaModel } from "./User.schema";
 import { DateTime } from "luxon";
-import { IDataSource } from "../../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
 import { AbstractModel } from "../common/AbstractModel.model";
 import {

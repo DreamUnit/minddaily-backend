@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-    server:
+    minddaily-server:
         build:
             context: ../../
             dockerfile: ./docker/development/Dockerfile
