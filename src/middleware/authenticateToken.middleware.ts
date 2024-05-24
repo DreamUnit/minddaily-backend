@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export function authenticateToken(req, res, next) {
+    console.log("authenticate token called with:", req);
     if (process.env.NODE_ENV === "development" && req.path === "/") {
         return next();
     }
