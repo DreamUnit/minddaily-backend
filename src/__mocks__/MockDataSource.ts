@@ -6,11 +6,11 @@ import {
 } from "../dataSources/DataSource.types";
 
 export class MockDataSource {
-    connect = jest.fn();
-    close = jest.fn();
+    connect = jest.fn().mockResolvedValue(true);
+    close = jest.fn().mockResolvedValue(true);
 
     write = jest.fn<any, any>(
-        (source: string, schema: any, opts: IWriteOpts<any>) =>
+        (source: string, schema: any, opts: IWriteOpts<any, any>) =>
             Promise.resolve(opts.data)
     );
     read = jest.fn<any, any>((source: string, opts: IReadOpts<any>) =>
@@ -30,10 +30,10 @@ export class MockDataSource {
         Promise.resolve(opts.data)
     );
     deleteById = jest.fn<any, any>(
-        (source: string, schema: any, opts: IDeleteOpts) =>
+        (source: string, schema: any, opts: IDeleteOpts<any>) =>
             Promise.resolve(true)
     );
-    softDelete = jest.fn<any, any>((source: string, opts: IDeleteOpts) =>
+    softDelete = jest.fn<any, any>((source: string, opts: IDeleteOpts<any>) =>
         Promise.resolve({ id: "softDeleted" })
     );
 }

@@ -6,34 +6,42 @@ import { AbstractModel } from "../common/AbstractModel.model";
 import {
     DiaryFilterOpts,
     DiaryNote,
+    DiaryNoteFilterOpts,
     MutationCreateDiaryNoteArgs,
     MutationUpdateDiaryNoteArgs,
 } from "../../__generated__/types";
+import { IRepository } from "../common/common.types";
 
 export class DiaryNotesModel extends AbstractModel<
     MutationCreateDiaryNoteArgs,
     MutationUpdateDiaryNoteArgs,
     DiaryNote
 > {
-    private readonly source: string = "diary_notes";
-    private readonly model = DiaryNoteSchemaModel;
-
-    constructor(private dataSource: IDataSource) {
+    private readonly repository: IRepository<
+        Partial<DiaryNote>,
+        Partial<DiaryNote>,
+        DiaryFilterOpts,
+        DiaryNote
+    >;
+    constructor(
+        diaryRepository: IRepository<
+            Partial<DiaryNote>,
+            Partial<DiaryNote>,
+            DiaryNoteFilterOpts,
+            DiaryNote
+        >
+    ) {
         super();
+        this.repository = diaryRepository;
     }
 
     public async create(
         inputData: MutationCreateDiaryNoteArgs
     ): Promise<DiaryNote> {
-        const data = await this.dataSource.write<Partial<DiaryNote>, DiaryNote>(
-            this.source,
-            this.model,
-            {
-                data: {
-                    ...inputData,
-                },
-            }
-        );
+        const data = await this.repository.create({
+            version: 1,
+            ...inputData,
+        });
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -42,33 +50,23 @@ export class DiaryNotesModel extends AbstractModel<
     }
 
     public async update(
-        id: string | number,
+        id: string,
         updatedData: MutationUpdateDiaryNoteArgs
     ): Promise<DiaryNote> {
-        const updatedDataResponse = await this.dataSource.update<
-            DiaryNote,
-            {},
-            DiaryNote
-        >(this.source, {
-            id: id,
-            data: updatedData,
-        });
+        const updatedDataResponse = await this.repository.update(
+            id,
+            updatedData
+        );
         return updatedDataResponse;
     }
 
-    public async delete(id: string | number): Promise<boolean> {
-        const deleteResponse = await this.dataSource.deleteById(
-            this.source,
-            this.model,
-            {
-                id: id,
-            }
-        );
+    public async delete(id: string): Promise<boolean> {
+        const deleteResponse = await this.repository.deleteById(id);
         return deleteResponse;
     }
 
     public async readById(id: string): Promise<DiaryNote | null> {
-        const data = await this.dataSource.readById<DiaryNote>(this.source, id);
+        const data = await this.repository.readById(id);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -77,14 +75,14 @@ export class DiaryNotesModel extends AbstractModel<
     }
 
     public async readByField(
-        filter: DiaryFilterOpts
+        opts: DiaryNoteFilterOpts
     ): Promise<DiaryNote[] | null> {
-        const value = filter.stringValue || filter.intValue;
-        let queryResult = await this.dataSource.readByField<DiaryNote>(
-            this.source,
-            filter.field,
-            value
-        );
+        const { field, intValue, stringValue } = opts;
+        let queryResult = await this.repository.readByField({
+            field,
+            intValue,
+            stringValue,
+        });
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
@@ -92,14 +90,10 @@ export class DiaryNotesModel extends AbstractModel<
         take: number,
         skip: number
     ): Promise<IReadManyAndCountResult<DiaryNote>> {
-        let data = await this.dataSource.read<DiaryFilterOpts, DiaryNote>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
-
+        const data = await this.repository.read({
+            take,
+            skip,
+        });
         return data;
     }
 }

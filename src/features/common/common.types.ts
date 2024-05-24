@@ -1,45 +1,21 @@
-import { DateTime } from "luxon";
-
-export interface IPagination {
-    take: number;
-    skip: number;
-}
-
-export interface IReadMany<T> {
-    code: number;
-    success: boolean;
-    message: string;
-    data: T[];
-    count: number;
-}
-
-export interface IRead<T> {
-    code: number;
-    success: boolean;
-    message: string;
-    data: T;
-}
-
-export interface IDelete {
-    code: number;
-    success: boolean;
-    message: string;
-}
-
-export interface IMetaProperties {
-    createdDate: DateTime;
-    updatedDate?: DateTime;
-    deletedDate?: DateTime;
-    version: number;
-}
-
-export interface IImage {
-    url: string;
-    title: string;
-}
+import {
+    IReadManyAndCountResult,
+    IReadOpts,
+} from "../../dataSources/DataSource.types";
 
 export interface IFilterOpts {
     field: string;
     stringValue?: string;
     intValue?: number;
+}
+
+export interface IRepository<CreateType, UpdateType, FilterType, ReturnType> {
+    create(data: CreateType): Promise<ReturnType>;
+    update(id: string, data: UpdateType): Promise<ReturnType>;
+    deleteById(id: string): Promise<boolean>;
+    readById(id: string): Promise<ReturnType | null>;
+    readByField(filter: FilterType): Promise<ReturnType[]>;
+    read(
+        opts: IReadOpts<IFilterOpts>
+    ): Promise<IReadManyAndCountResult<ReturnType>>;
 }

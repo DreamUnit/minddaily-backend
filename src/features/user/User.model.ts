@@ -9,36 +9,42 @@ import {
     User,
     UserFilterOpts,
 } from "../../__generated__/types";
+import { IRepository } from "../common/common.types";
 
 export class UserModel extends AbstractModel<
     MutationCreateUserArgs,
     MutationUpdateUserArgs,
     User
 > {
-    private readonly source: string = "users";
-    private readonly model = UsersSchemaModel;
-
-    constructor(private dataSource: IDataSource) {
+    private readonly repository: IRepository<
+        Partial<User>,
+        Partial<User>,
+        UserFilterOpts,
+        User
+    >;
+    constructor(
+        userRepository: IRepository<
+            Partial<User>,
+            Partial<User>,
+            UserFilterOpts,
+            User
+        >
+    ) {
         super();
+        this.repository = userRepository;
     }
 
     public async create(inputData: MutationCreateUserArgs): Promise<User> {
-        const data = await this.dataSource.write<Partial<User>, User>(
-            this.source,
-            this.model,
-            {
-                data: {
-                    createdDate: DateTime.utc(),
-                    updatedDate: null,
-                    version: 1,
-                    permissions: [],
-                    active: true,
-                    points: 0,
-                    locale: `en-gb`,
-                    ...inputData,
-                },
-            }
-        );
+        const data = await this.repository.create({
+            createdDate: DateTime.utc(),
+            updatedDate: null,
+            version: 1,
+            permissions: [],
+            active: true,
+            points: 0,
+            locale: `en-gb`,
+            ...inputData,
+        });
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -47,35 +53,23 @@ export class UserModel extends AbstractModel<
     }
 
     public async update(
-        id: number | string,
+        id: string,
         updatedData: MutationUpdateUserArgs
     ): Promise<User> {
-        const updatedDate = DateTime.utc();
-
-        const updatedDataResponse = await this.dataSource.update<
-            User,
-            {},
-            User
-        >(this.source, {
-            id: id,
-            data: { ...updatedData, updatedDate },
-        });
+        const updatedDataResponse = await this.repository.update(
+            id,
+            updatedData
+        );
         return updatedDataResponse;
     }
 
-    public async delete(id: string | number): Promise<boolean> {
-        const deleteResponse = await this.dataSource.deleteById(
-            this.source,
-            this.model,
-            {
-                id: id,
-            }
-        );
+    public async delete(id: string): Promise<boolean> {
+        const deleteResponse = await this.repository.deleteById(id);
         return deleteResponse;
     }
 
-    public async readById(id: string | number): Promise<User | null> {
-        const data = await this.dataSource.readById<User>(this.source, id);
+    public async readById(id: string): Promise<User | null> {
+        const data = await this.repository.readById(id);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -83,13 +77,13 @@ export class UserModel extends AbstractModel<
         return null;
     }
 
-    public async readByField(filter: UserFilterOpts): Promise<User[] | null> {
-        const value = filter.stringValue || filter.intValue;
-        let queryResult = await this.dataSource.readByField<User>(
-            this.source,
-            filter.field,
-            value
-        );
+    public async readByField(opts: UserFilterOpts): Promise<User[] | null> {
+        const { field, intValue, stringValue } = opts;
+        let queryResult = await this.repository.readByField({
+            field,
+            intValue,
+            stringValue,
+        });
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
@@ -97,13 +91,10 @@ export class UserModel extends AbstractModel<
         take: number,
         skip: number
     ): Promise<IReadManyAndCountResult<User>> {
-        const data = await this.dataSource.read<UserFilterOpts, User>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
+        const data = await this.repository.read({
+            take,
+            skip,
+        });
         return data;
     }
 }

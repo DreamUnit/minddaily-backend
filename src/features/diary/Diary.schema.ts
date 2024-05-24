@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { MetaPropertiesSchema } from "../common/AbstractSchema.schema";
-const { Schema } = mongoose;
 
 const DiarySchema = new Schema({
     title: { type: String, required: true },
-    userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    userId: { type: Types.ObjectId, ref: "users", required: true },
     ...MetaPropertiesSchema.obj,
 });
 

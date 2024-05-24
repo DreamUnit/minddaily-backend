@@ -1,10 +1,11 @@
-import {
-    userModel,
-    diaryModel,
-    diaryNotesModel,
-    dataSource,
-    logger,
-} from "../config/dataServices.service";
+import { Diary, User } from "../__generated__/types";
+import { DatasourceManager } from "../config/DatasourceManager.service";
+import { LoggerManager } from "../config/LoggerManager.service";
+import models from "../features/index.model";
+
+const { logger } = LoggerManager.getInstance();
+const { dataSource } = DatasourceManager.getInstance();
+const { userModel, diaryModel, diaryNotesModel } = models;
 
 const firstNames = [
     "John",
@@ -63,14 +64,14 @@ export async function seedMongoDb() {
             random = Math.floor(Math.random() * 7);
             randomV2 = Math.floor(Math.random() * 7);
 
-            const user = await userModel.create({
+            const user: User = await userModel.create({
                 authUserId: `abcdef${i}`,
                 name: `${firstNames[random]} ${foreNames[randomV2]}`,
                 email: `${firstNames[random]} ${foreNames[randomV2]}${i}@hotmail.com`,
-                locale: `EU`,
+                locale: `en-GB`,
             });
 
-            const diary = await diaryModel.create({
+            const diary: Diary = await diaryModel.create({
                 userId: user.id,
                 title: diaryTitles[random],
             });
@@ -84,6 +85,7 @@ export async function seedMongoDb() {
 
         await dataSource.close();
     } catch (err) {
+        await dataSource.close();
         return logger.error(`failed to seed db with an error of ${err}`);
     }
     logger.info("completed seeding db");

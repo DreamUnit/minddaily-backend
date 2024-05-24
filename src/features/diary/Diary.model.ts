@@ -1,6 +1,5 @@
 import { IDataSource } from "../../dataSources/DataSource.datasource";
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
-import { DiarySchemaModel } from "./Diary.schema";
 import { AbstractModel } from "../common/AbstractModel.model";
 import {
     Diary,
@@ -8,29 +7,36 @@ import {
     MutationCreateDiaryArgs,
     MutationUpdateDiaryArgs,
 } from "../../__generated__/types";
+import { IRepository } from "../common/common.types";
 
 export class DiaryModel extends AbstractModel<
     MutationCreateDiaryArgs,
     MutationUpdateDiaryArgs,
     Diary
 > {
-    private readonly source: string = "diaries";
-    private readonly model = DiarySchemaModel;
-
-    constructor(private dataSource: IDataSource) {
+    private readonly repository: IRepository<
+        Partial<Diary>,
+        Partial<Diary>,
+        DiaryFilterOpts,
+        Diary
+    >;
+    constructor(
+        diaryRepository: IRepository<
+            Partial<Diary>,
+            Partial<Diary>,
+            DiaryFilterOpts,
+            Diary
+        >
+    ) {
         super();
+        this.repository = diaryRepository;
     }
 
-    async create(inputData: MutationCreateDiaryArgs): Promise<Diary> {
-        const data = await this.dataSource.write<Partial<Diary>, Diary>(
-            this.source,
-            this.model,
-            {
-                data: {
-                    ...inputData,
-                },
-            }
-        );
+    public async create(inputData: MutationCreateDiaryArgs): Promise<Diary> {
+        const data = await this.repository.create({
+            version: 1,
+            ...inputData,
+        });
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -39,33 +45,23 @@ export class DiaryModel extends AbstractModel<
     }
 
     async update(
-        id: string | number,
+        id: string,
         updatedData: MutationUpdateDiaryArgs
     ): Promise<Diary> {
-        const updatedDataResponse = await this.dataSource.update<
-            Diary,
-            {},
-            Diary
-        >(this.source, {
-            id: id,
-            data: updatedData,
-        });
+        const updatedDataResponse = await this.repository.update(
+            id,
+            updatedData
+        );
         return updatedDataResponse;
     }
 
-    async delete(id: string | number): Promise<boolean> {
-        const deleteResponse = await this.dataSource.deleteById(
-            this.source,
-            this.model,
-            {
-                id: id,
-            }
-        );
+    async delete(id: string): Promise<boolean> {
+        const deleteResponse = await this.repository.deleteById(id);
         return deleteResponse;
     }
 
     async readById(id: string): Promise<Diary | null> {
-        const data = await this.dataSource.readById<Diary>(this.source, id);
+        const data = await this.repository.readById(id);
 
         if (data !== null && Object.keys(data).length > 0) {
             return data;
@@ -73,13 +69,13 @@ export class DiaryModel extends AbstractModel<
         return null;
     }
 
-    async readByField(filter: DiaryFilterOpts): Promise<Diary[] | null> {
-        const value = filter.stringValue || filter.intValue;
-        let queryResult = await this.dataSource.readByField<Diary>(
-            this.source,
-            filter.field,
-            value
-        );
+    async readByField(opts: DiaryFilterOpts): Promise<Diary[] | null> {
+        const { field, intValue, stringValue } = opts;
+        let queryResult = await this.repository.readByField({
+            field,
+            intValue,
+            stringValue,
+        });
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
 
@@ -87,13 +83,10 @@ export class DiaryModel extends AbstractModel<
         take: number,
         skip: number
     ): Promise<IReadManyAndCountResult<Diary>> {
-        const data = await this.dataSource.read<DiaryFilterOpts, Diary>(
-            this.source,
-            {
-                take: take,
-                skip: skip,
-            }
-        );
+        const data = await this.repository.read({
+            take,
+            skip,
+        });
         return data;
     }
 }

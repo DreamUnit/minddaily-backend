@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest --runInBand --config jest.config.ts",
+        "test": "jest --watch --runInBand --config jest.config.ts ",
         "test:coverage": "jest --coverage",
         "test:detectOpenHandles": "jest --detectOpenHandles --config jest.config.ts",
         "build": "tsc",

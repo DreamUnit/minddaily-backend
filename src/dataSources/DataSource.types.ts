@@ -1,4 +1,4 @@
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 
 // query needs to be updated here to a generic here.
 export interface IReadOpts<Filter> {
@@ -16,16 +16,29 @@ export interface IReadManyAndCountResult<R> {
     count: number;
 }
 
-export interface IWriteOpts<T> {
+/** Write Opts, can be extended with various DB
+ * schema types such as a SQL entity if needed.
+ */
+export interface IWriteOpts<T, MongoModel> {
+    source: string;
     data: T;
+    schemaModel: mongoose.Model<MongoModel>;
 }
 
 export interface IUpdateOpts<T, Query> {
     id: string | number;
-    query?: Query;
+    source: string;
     data: Partial<T>;
+    query?: Query;
+}
+export interface IReadByFieldOpts {
+    source: string;
+    field: string;
+    value: string | number;
 }
 
-export interface IDeleteOpts {
+export interface IDeleteOpts<MongoModel> {
     id: string | number;
+    source: string;
+    schemaModel: mongoose.Model<MongoModel>;
 }

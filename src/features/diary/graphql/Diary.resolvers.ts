@@ -1,27 +1,45 @@
-import {
-    diaryModel,
-    diaryNotesModel,
-    logger,
-} from "../../../config/dataServices.service";
+import { DatasourceManager } from "../../../config/DatasourceManager.service";
 import {
     DeleteResponse,
+    DiaryResolvers,
     MutationCreateDiaryArgs,
     MutationDeleteDiaryArgs,
+    MutationResolvers,
     MutationUpdateDiaryArgs,
     QueryReadDiariesArgs,
     QueryReadDiaryByIdArgs,
+    QueryResolvers,
     ReadDiariesResponse,
     ReadDiaryResponse,
 } from "../../../__generated__/types";
+import { DiaryModel } from "../Diary.model";
 
-export const diaryResolvers = {
-    Query: {
+import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
+import { DiaryNotesModel } from "../../diary-notes/DiaryNotes.model";
+import { Logger } from "../../../utils/Logger.util";
+
+export class DiaryResolver extends AbstractResolver {
+    private readonly diaryModel: DiaryModel;
+    private readonly diaryNotesModel: DiaryNotesModel;
+    private readonly logger: Logger;
+
+    constructor(
+        diaryModel: DiaryModel,
+        diaryNotesModel: DiaryNotesModel,
+        logger: Logger
+    ) {
+        super();
+        this.diaryModel = diaryModel;
+        this.diaryNotesModel = diaryNotesModel;
+        this.logger = logger;
+    }
+    private query: QueryResolvers = {
         readDiaries: async (
             _,
             { take, skip }: QueryReadDiariesArgs
         ): Promise<ReadDiariesResponse> => {
             try {
-                const data = await diaryModel.readMany(take, skip);
+                const data = await this.diaryModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
@@ -45,7 +63,7 @@ export const diaryResolvers = {
             { id }: QueryReadDiaryByIdArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await diaryModel.readById(id);
+                const data = await this.diaryModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -61,15 +79,15 @@ export const diaryResolvers = {
                 };
             }
         },
-    },
+    };
 
-    Mutation: {
+    private mutation: MutationResolvers = {
         createDiary: async (
             _,
             { userId, title }: MutationCreateDiaryArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await diaryModel.create({
+                const data = await this.diaryModel.create({
                     userId,
                     title,
                 });
@@ -95,7 +113,7 @@ export const diaryResolvers = {
             { id, userId, title }: MutationUpdateDiaryArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await diaryModel.update(id, {
+                const data = await this.diaryModel.update(id, {
                     id,
                     userId,
                     title,
@@ -121,7 +139,7 @@ export const diaryResolvers = {
             { id }: MutationDeleteDiaryArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await diaryModel.delete(id);
+                const data = await this.diaryModel.delete(id);
                 return {
                     code: 200,
                     success: true,
@@ -135,18 +153,27 @@ export const diaryResolvers = {
                 };
             }
         },
-    },
-    Diary: {
+    };
+
+    private diary: DiaryResolvers = {
         notes: async parent => {
             try {
-                const diaryNotes = await diaryNotesModel.readByField({
+                const diaryNotes = await this.diaryNotesModel.readByField({
                     field: "diaryId",
                     stringValue: parent.id,
                 });
                 return diaryNotes;
             } catch (err) {
-                logger.error("Error fetching diary notes:", err);
+                this.logger.error("Error fetching diaries :", err);
             }
         },
-    },
-};
+    };
+
+    public getResolvers() {
+        return {
+            Query: this.query,
+            Mutation: this.mutation,
+            Diary: this.diary,
+        };
+    }
+}

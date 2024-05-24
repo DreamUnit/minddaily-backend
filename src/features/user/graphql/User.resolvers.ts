@@ -1,27 +1,40 @@
 import {
-    userModel,
-    diaryModel,
-    logger,
-} from "../../../config/dataServices.service";
-import {
     DeleteResponse,
     MutationCreateUserArgs,
     MutationDeleteUserArgs,
+    MutationResolvers,
     MutationUpdateUserArgs,
     QueryReadUserByIdArgs,
     QueryReadUsersArgs,
+    QueryResolvers,
     ReadUserResponse,
     ReadUsersResponse,
+    UserResolvers,
 } from "../../../__generated__/types";
+import { UserModel } from "../User.model";
+import { Logger } from "../../../utils/Logger.util";
+import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
+import { DiaryModel } from "../../diary/Diary.model";
 
-export const userResolvers = {
-    Query: {
+export class UserResolver extends AbstractResolver {
+    private readonly userModel: UserModel;
+    private readonly diaryModel: DiaryModel;
+    private readonly logger: Logger;
+
+    constructor(userModel: UserModel, diaryModel: DiaryModel, logger: Logger) {
+        super();
+        this.userModel = userModel;
+        this.diaryModel = diaryModel;
+        this.logger = logger;
+    }
+
+    private query: QueryResolvers = {
         readUsers: async (
             _,
             { take, skip }: QueryReadUsersArgs
         ): Promise<ReadUsersResponse> => {
             try {
-                const data = await userModel.readMany(take, skip);
+                const data = await this.userModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
@@ -45,7 +58,7 @@ export const userResolvers = {
             { id }: QueryReadUserByIdArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await userModel.readById(id);
+                const data = await this.userModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -61,15 +74,15 @@ export const userResolvers = {
                 };
             }
         },
-    },
+    };
 
-    Mutation: {
+    private mutation: MutationResolvers = {
         createUser: async (
             _,
             { authUserId, name, email, locale }: MutationCreateUserArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await userModel.create({
+                const data = await this.userModel.create({
                     authUserId: authUserId,
                     name: name,
                     email: email,
@@ -105,7 +118,7 @@ export const userResolvers = {
             }: MutationUpdateUserArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await userModel.update(id, {
+                const data = await this.userModel.update(id, {
                     id,
                     name,
                     email,
@@ -135,7 +148,7 @@ export const userResolvers = {
             { id }: MutationDeleteUserArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await userModel.delete(id);
+                const data = await this.userModel.delete(id);
                 return {
                     code: 200,
                     success: true,
@@ -149,18 +162,27 @@ export const userResolvers = {
                 };
             }
         },
-    },
-    User: {
+    };
+
+    private user: UserResolvers = {
         diaries: async parent => {
             try {
-                const diaries = await diaryModel.readByField({
+                const diaries = await this.diaryModel.readByField({
                     field: "userId",
                     stringValue: parent.id,
                 });
                 return diaries;
             } catch (err) {
-                logger.error("Error fetching diaries :", err);
+                this.logger.error("Error fetching diaries :", err);
             }
         },
-    },
-};
+    };
+
+    public getResolvers() {
+        return {
+            Query: this.query,
+            Mutation: this.mutation,
+            User: this.user,
+        };
+    }
+}
