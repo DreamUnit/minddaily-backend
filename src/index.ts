@@ -11,4 +11,7 @@ dotenv.config({
     ),
 });
 
+console.log("process env index NODE_ENV:", process.env.NODE_ENV);
+console.log("process env index SCHEMA_PORT:", process.env.SCHEMA_PORT);
+
 startServer();
