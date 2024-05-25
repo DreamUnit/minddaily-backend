@@ -4,6 +4,7 @@ import { User } from "../__generated__/types";
 
 class AuthController extends AbstractController {
     public handleAuth(req, res) {
+        console.log("handle auth user:", req.user);
         const user = req.user as User;
         const token = jwt.sign(
             { id: user.authUserId },
