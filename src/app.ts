@@ -13,6 +13,7 @@ import { typeDefs } from "./features/index.schemas";
 import { resolvers } from "./features/index.resolvers";
 import dotenv from "dotenv";
 import path from "path";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 
 dotenv.config({
     path: path.resolve(
@@ -25,10 +26,9 @@ dotenv.config({
 export const app = express();
 export const httpServer = http.createServer(app);
 export const apolloServer = new ApolloServer<DataSourceContext>({
-    typeDefs,
-    resolvers,
+    schema: makeExecutableSchema({ typeDefs, resolvers }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: process.env.NODE_ENV === "development",
+    introspection: false,
 });
 
 app.use(express.json());
@@ -37,6 +37,7 @@ app.use(
         origin: process.env.CORS_DOMAINS.split(","),
     })
 );
+console.log("cors origin:", process.env.CORS_DOMAINS.split(","));
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
