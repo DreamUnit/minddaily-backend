@@ -1,12 +1,14 @@
 import jwt from "jsonwebtoken";
 
 export function authenticateToken(req, res, next) {
-    console.log("authenticate token called with:", req);
     if (process.env.NODE_ENV === "development" && req.path === "/") {
         return next();
     }
     const authHeader = req.headers.authorization;
+    console.log("auth header:", authHeader);
+
     const token = authHeader && authHeader.split(" ")[1];
+    console.log("token:", token);
     if (token == null)
         return res.send({
             code: 401,
