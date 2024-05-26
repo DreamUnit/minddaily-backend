@@ -4,22 +4,20 @@ import { User } from "../__generated__/types";
 
 class AuthController extends AbstractController {
     public handleAuth(req, res) {
-        console.log("handle auth user:", req.user);
         const user = req.user as User;
         const token = jwt.sign(
             { id: user.authUserId },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
-        res.cookie(
-            "token",
-            { token: token, user: user },
-            {
-                httpOnly: true,
-                secure: true,
-                sameSite: "None",
-            }
-        );
+        res.cookie("jwtToken", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+            overWrite: true,
+            path: "/",
+        });
+
         res.redirect(`${process.env.CLIENTSIDE_URL}/dashboard/diaries`);
     }
 }

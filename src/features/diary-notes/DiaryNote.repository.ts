@@ -69,7 +69,8 @@ export class DiaryNoteRepository
     ): Promise<DiaryNote[]> {
         return this.dataSource.readByField<DiaryNote>({
             source: this.source,
-            query: filter,
+            field: filter.field,
+            value: filter.intValue || filter.stringValue,
         });
     }
 

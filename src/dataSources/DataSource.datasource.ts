@@ -4,6 +4,7 @@ import {
     IReadManyAndCountResult,
     IUpdateOpts,
     IDeleteOpts,
+    IReadByFieldOpts,
 } from "./DataSource.types";
 
 export interface IDataSource {
@@ -15,7 +16,7 @@ export interface IDataSource {
         opts: IReadOpts<Filter>
     ): Promise<IReadManyAndCountResult<R>>;
     readById<R>(source: string, id: string | number): Promise<R>;
-    readByField<R>(IReadByFieldOpts): Promise<R[] | null>;
+    readByField<R>(opts: IReadByFieldOpts): Promise<R[] | null>;
     update<T, Query, R>(opts: IUpdateOpts<T, Query>): Promise<R>;
     deleteById<MongoModel>(opts: IDeleteOpts<MongoModel>): Promise<boolean>;
     softDelete<R, MongoModel>(opts: IDeleteOpts<MongoModel>): Promise<R>;

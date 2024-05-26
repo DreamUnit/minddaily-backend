@@ -92,6 +92,7 @@ export class MongodbDataSource implements IDataSource {
 
     public async readByField<R>(opts: IReadByFieldOpts): Promise<R[] | null> {
         const { source, field, value } = opts;
+
         const model = mongoose.model<R>(source);
         const query = { [field]: value } as mongoose.FilterQuery<R>;
         const document = await model.find(query).exec();

@@ -14,6 +14,7 @@ import { resolvers } from "./features/index.resolvers";
 import dotenv from "dotenv";
 import path from "path";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import cookieParser from "cookie-parser";
 
 dotenv.config({
     path: path.resolve(
@@ -24,6 +25,16 @@ dotenv.config({
     ),
 });
 export const app = express();
+app.use(cookieParser());
+app.use(express.json());
+app.use(
+    cors<cors.CorsRequest>({
+        origin: process.env.CORS_DOMAINS.split(","),
+        credentials: true,
+    })
+);
+console.log("cors origin:", process.env.CORS_DOMAINS.split(","));
+
 export const httpServer = http.createServer(app);
 export const apolloServer = new ApolloServer<DataSourceContext>({
     schema: makeExecutableSchema({ typeDefs, resolvers }),
@@ -31,13 +42,6 @@ export const apolloServer = new ApolloServer<DataSourceContext>({
     introspection: false,
 });
 
-app.use(express.json());
-app.use(
-    cors<cors.CorsRequest>({
-        origin: process.env.CORS_DOMAINS.split(","),
-    })
-);
-console.log("cors origin:", process.env.CORS_DOMAINS.split(","));
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());

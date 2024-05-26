@@ -58,7 +58,8 @@ export class UserRepository
     public async readByField(filter: Partial<UserFilterOpts>): Promise<User[]> {
         return await this.dataSource.readByField<User>({
             source: this.source,
-            query: filter,
+            field: filter.field,
+            value: filter.intValue || filter.stringValue,
         });
     }
 
