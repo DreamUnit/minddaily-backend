@@ -61,7 +61,8 @@ export class DiaryRepository
     ): Promise<Diary[]> {
         return this.dataSource.readByField<Diary>({
             source: this.source,
-            query: filter,
+            field: filter.field,
+            value: filter.intValue || filter.stringValue,
         });
     }
 
