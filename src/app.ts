@@ -37,7 +37,7 @@ app.use(
         origin: process.env.CORS_DOMAINS.split(","),
     })
 );
-console.log(process.env.CORS_DOMAINS.split(","));
+
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
