@@ -8,8 +8,8 @@ export const UserSchema = new Schema({
     name: { type: String, required: true },
     locale: { type: String, required: true },
     permissions: [{ type: String }],
-    active: { type: Boolean, required: true },
-    points: { type: Number, required: true },
+    active: { type: Boolean, required: false, default: true },
+    points: { type: Number, required: false, default: 0 },
     ...MetaPropertiesSchema.obj,
 });
 
