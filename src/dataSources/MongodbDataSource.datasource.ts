@@ -43,7 +43,7 @@ export class MongodbDataSource implements IDataSource {
         const countQuery = model.find(opts.query).merge(query);
 
         if (opts.select) {
-            query = query.select(opts.select);
+            query = query.select(opts.query);
         }
         if (opts.relations) {
             opts.relations.forEach(include => {
