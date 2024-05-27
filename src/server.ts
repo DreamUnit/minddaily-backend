@@ -25,5 +25,6 @@ export async function startServer() {
         httpServer.listen({ port: process.env.SERVER_PORT }, resolve)
     );
 
+    logger.info(`process env server NODE_ENV:, ${process.env.NODE_ENV}`);
     logger.info(`🚀 Server ready at ${process.env.SCHEMA_PORT}`);
 }

@@ -3,17 +3,23 @@ import passport from "passport";
 import authController from "../controllers/index.controller";
 
 const router = express.Router();
-router.get(
-    "/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
-);
+
+router.get("/auth/google", (req, res, next) => {
+    passport.authenticate("google", { scope: ["profile", "email"] })(
+        req,
+        res,
+        next
+    );
+});
 
 router.get(
     "/auth/google/callback",
-    passport.authenticate("google", {
-        failureRedirect: "/login",
-        failureMessage: true,
-    }),
+    (req, res, next) => {
+        passport.authenticate("google", {
+            failureRedirect: "/login",
+            failureMessage: true,
+        })(req, res, next);
+    },
     authController.handleAuth
 );
 

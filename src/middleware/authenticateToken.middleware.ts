@@ -4,8 +4,8 @@ export function authenticateToken(req, res, next) {
     if (process.env.NODE_ENV === "development" && req.path === "/") {
         return next();
     }
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+
+    const token = req.cookies.jwtToken;
     if (token == null)
         return res.send({
             code: 401,

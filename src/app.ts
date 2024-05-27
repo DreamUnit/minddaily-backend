@@ -13,6 +13,8 @@ import { typeDefs } from "./features/index.schemas";
 import { resolvers } from "./features/index.resolvers";
 import dotenv from "dotenv";
 import path from "path";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import cookieParser from "cookie-parser";
 
 dotenv.config({
     path: path.resolve(
@@ -23,20 +25,21 @@ dotenv.config({
     ),
 });
 export const app = express();
-export const httpServer = http.createServer(app);
-export const apolloServer = new ApolloServer<DataSourceContext>({
-    typeDefs,
-    resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: process.env.NODE_ENV === "development",
-});
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(
     cors<cors.CorsRequest>({
         origin: process.env.CORS_DOMAINS.split(","),
+        credentials: true,
     })
 );
+
+export const httpServer = http.createServer(app);
+export const apolloServer = new ApolloServer<DataSourceContext>({
+    schema: makeExecutableSchema({ typeDefs, resolvers }),
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: process.env.NODE_ENV === "development",
+});
 
 app.use(session(sessionConfig));
 app.use(passport.initialize());

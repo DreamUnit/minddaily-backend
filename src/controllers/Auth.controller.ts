@@ -10,15 +10,14 @@ class AuthController extends AbstractController {
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
-        res.cookie(
-            "token",
-            { token: token, user: user },
-            {
-                httpOnly: true,
-                secure: true,
-                sameSite: "None",
-            }
-        );
+        res.cookie("jwtToken", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+            overWrite: true,
+            path: "/",
+        });
+
         res.redirect(`${process.env.CLIENTSIDE_URL}/dashboard/diaries`);
     }
 }
