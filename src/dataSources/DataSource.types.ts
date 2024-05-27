@@ -22,6 +22,8 @@ export interface IReadManyAndCountResult<R> {
 export interface IWriteOpts<T, MongoModel> {
     source: string;
     data: T;
+    delete?: boolean;
+    update?: boolean;
     schemaModel: mongoose.Model<MongoModel>;
 }
 

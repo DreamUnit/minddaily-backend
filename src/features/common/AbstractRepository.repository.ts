@@ -3,10 +3,11 @@ import { IDataSource } from "../../dataSources/DataSource.datasource";
 import {
     IReadManyAndCountResult,
     IReadOpts,
+    IWriteOpts,
 } from "../../dataSources/DataSource.types";
 
 /** Encapsulates CRUD logic for repositories */
-abstract class AbstractRespository<
+abstract class AbstractRepository<
     CreateType,
     UpdateType,
     FilterType,
@@ -22,66 +23,84 @@ abstract class AbstractRespository<
     ) {
         this.source = source;
         this.schemaModel = schemaModel;
-        const datasourceType = process.env.DATABASE_TYPE;
-        switch (datasourceType) {
-            case "mongodb":
-                this.schemaModel = schemaModel;
-                break;
-            case "sql":
-                throw new Error("Not implemented yet");
-            default:
-                break;
-        }
     }
 
     public async create(data: Partial<CreateType>): Promise<ReturnType> {
-        return this.dataSource.write<Partial<CreateType>, any, ReturnType>({
+        const opts: IWriteOpts<Partial<CreateType>, any> = {
             source: this.source,
             schemaModel: this.schemaModel,
             data,
-        });
+        };
+        return this.dataSource.write<Partial<CreateType>, any, ReturnType>(
+            opts
+        );
     }
 
     public async update(
         id: string,
         data: Partial<UpdateType>
     ): Promise<ReturnType> {
-        return this.dataSource.update<Partial<UpdateType>, any, ReturnType>({
+        const opts: IWriteOpts<Partial<UpdateType>, any> = {
             source: this.source,
-            id,
-            data,
-        });
+            schemaModel: this.schemaModel,
+            update: true,
+            data: {
+                _id: id,
+                ...data,
+            },
+        };
+        return this.dataSource.write<Partial<UpdateType>, any, ReturnType>(
+            opts
+        );
     }
 
     public async deleteById(id: string): Promise<boolean> {
-        return this.dataSource.deleteById({
+        const opts: IWriteOpts<{ id: string }, any> = {
             source: this.source,
-            id,
+            delete: true,
+            data: { id },
             schemaModel: this.schemaModel,
-        });
+        };
+        return this.dataSource.write<{ id: string }, any, boolean>(opts);
     }
 
     public async readById(id: string): Promise<ReturnType | null> {
-        return this.dataSource.readById<ReturnType>(this.source, id);
+        const opts: IReadOpts<Partial<FilterType>> = {
+            query: { _id: id },
+            take: 1,
+            skip: 0,
+        };
+        const result = await this.dataSource.read<
+            Partial<FilterType>,
+            IReadManyAndCountResult<ReturnType>
+        >(this.source, opts);
+        return result.data ? result.data[0] : null;
     }
 
+    // setup resolver
     public async readByField(
         filter: Partial<FilterType>
     ): Promise<ReturnType[]> {
-        return this.dataSource.readByField<ReturnType>({
-            source: this.source,
+        const opts: IReadOpts<Partial<FilterType>> = {
             query: filter,
-        });
+            take: 0,
+            skip: 0,
+        };
+        const result = await this.dataSource.read<
+            Partial<FilterType>,
+            IReadManyAndCountResult<ReturnType>
+        >(this.source, opts);
+        return result.data || [];
     }
 
     public async read(
         opts: IReadOpts<FilterType>
     ): Promise<IReadManyAndCountResult<ReturnType>> {
-        return await this.dataSource.read<FilterType, ReturnType>(
-            this.source,
-            opts
-        );
+        return await this.dataSource.read<
+            FilterType,
+            IReadManyAndCountResult<ReturnType>
+        >(this.source, opts);
     }
 }
 
-export default AbstractRespository;
+export default AbstractRepository;

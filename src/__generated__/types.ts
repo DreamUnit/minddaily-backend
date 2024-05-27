@@ -144,9 +144,11 @@ export type MutationUpdateUserArgs = {
 export type Query = {
   __typename?: 'Query';
   readDiaries?: Maybe<ReadDiariesResponse>;
+  readDiaryByField?: Maybe<ReadDiariesResponse>;
   readDiaryById?: Maybe<ReadDiaryResponse>;
   readDiaryNoteById?: Maybe<ReadDiaryNoteResponse>;
   readDiaryNotes?: Maybe<ReadDiaryNotesResponse>;
+  readDiaryNotesByField?: Maybe<ReadDiaryNotesResponse>;
   readUserById?: Maybe<ReadUserResponse>;
   readUsers?: Maybe<ReadUsersResponse>;
 };
@@ -155,6 +157,11 @@ export type Query = {
 export type QueryReadDiariesArgs = {
   skip: Scalars['Int']['input'];
   take: Scalars['Int']['input'];
+};
+
+
+export type QueryReadDiaryByFieldArgs = {
+  filter: DiaryFilterOpts;
 };
 
 
@@ -171,6 +178,11 @@ export type QueryReadDiaryNoteByIdArgs = {
 export type QueryReadDiaryNotesArgs = {
   skip: Scalars['Int']['input'];
   take: Scalars['Int']['input'];
+};
+
+
+export type QueryReadDiaryNotesByFieldArgs = {
+  filter: DiaryNoteFilterOpts;
 };
 
 
@@ -433,9 +445,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   readDiaries?: Resolver<Maybe<ResolversTypes['ReadDiariesResponse']>, ParentType, ContextType, RequireFields<QueryReadDiariesArgs, 'skip' | 'take'>>;
+  readDiaryByField?: Resolver<Maybe<ResolversTypes['ReadDiariesResponse']>, ParentType, ContextType, RequireFields<QueryReadDiaryByFieldArgs, 'filter'>>;
   readDiaryById?: Resolver<Maybe<ResolversTypes['ReadDiaryResponse']>, ParentType, ContextType, RequireFields<QueryReadDiaryByIdArgs, 'id'>>;
   readDiaryNoteById?: Resolver<Maybe<ResolversTypes['ReadDiaryNoteResponse']>, ParentType, ContextType, RequireFields<QueryReadDiaryNoteByIdArgs, 'id'>>;
   readDiaryNotes?: Resolver<Maybe<ResolversTypes['ReadDiaryNotesResponse']>, ParentType, ContextType, RequireFields<QueryReadDiaryNotesArgs, 'skip' | 'take'>>;
+  readDiaryNotesByField?: Resolver<Maybe<ResolversTypes['ReadDiaryNotesResponse']>, ParentType, ContextType, RequireFields<QueryReadDiaryNotesByFieldArgs, 'filter'>>;
   readUserById?: Resolver<Maybe<ResolversTypes['ReadUserResponse']>, ParentType, ContextType, RequireFields<QueryReadUserByIdArgs, 'id'>>;
   readUsers?: Resolver<Maybe<ResolversTypes['ReadUsersResponse']>, ParentType, ContextType, RequireFields<QueryReadUsersArgs, 'skip' | 'take'>>;
 };
