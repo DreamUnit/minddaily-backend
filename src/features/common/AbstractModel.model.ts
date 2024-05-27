@@ -34,11 +34,14 @@ export abstract class AbstractModel<CreateType, UpdateType, ResponseType> {
         opts: IFilterOpts
     ): Promise<ResponseType[] | null> {
         const { field, intValue, stringValue } = opts;
-        let queryResult = await this.repository.readByField({
-            field,
-            intValue,
-            stringValue,
-        });
+        const filter: any = {};
+        if (intValue !== undefined) {
+            filter[field] = intValue;
+        } else if (stringValue !== undefined) {
+            filter[field] = stringValue;
+        }
+
+        const queryResult = await this.repository.readByField(filter);
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
     public async readMany(

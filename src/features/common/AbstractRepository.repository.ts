@@ -83,7 +83,7 @@ abstract class AbstractRepository<
     ): Promise<ReturnType[]> {
         const opts: IReadOpts<Partial<FilterType>> = {
             query: filter,
-            take: 0,
+            take: 20, // need to change this make it dynamic or something
             skip: 0,
         };
         const result = await this.dataSource.read<

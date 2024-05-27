@@ -12,7 +12,7 @@ const googleStrategy = new GoogleStrategy(
             field: "authUserId",
             stringValue: profile.id,
         });
-        if (existingUser[0] == null) {
+        if (existingUser.length === 0) {
             const newUser = await userModel.create({
                 authUserId: profile.id,
                 name: `${profile.name.givenName} ${profile.name.familyName}`,
