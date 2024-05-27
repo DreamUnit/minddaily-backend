@@ -1,25 +1,17 @@
 import { AbstractModel } from "../common/AbstractModel.model";
 import {
     Diary,
-    DiaryFilterOpts,
     MutationCreateDiaryArgs,
     MutationUpdateDiaryArgs,
 } from "../../__generated__/types";
-import { IRepository } from "../common/common.types";
+import { DiaryRepository } from "./Diary.repository";
 
 export class DiaryModel extends AbstractModel<
     MutationCreateDiaryArgs,
     MutationUpdateDiaryArgs,
     Diary
 > {
-    constructor(
-        diaryRepository: IRepository<
-            Partial<Diary>,
-            Partial<Diary>,
-            DiaryFilterOpts,
-            Diary
-        >
-    ) {
+    constructor(diaryRepository: DiaryRepository) {
         super(diaryRepository);
     }
 }

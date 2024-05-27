@@ -11,9 +11,9 @@ export const diaryNoteTypeDefs = gql`
 
     type Query {
         readDiaryNotes(take: Int!, skip: Int!): ReadDiaryNotesResponse
-        # readDiaryNotesByField(
-        #     filter: DiaryNoteFilterOpts!
-        # ): ReadDiaryNotesResponse
+        readDiaryNotesByField(
+            filter: DiaryNoteFilterOpts!
+        ): ReadDiaryNotesResponse
         readDiaryNoteById(id: ID!): ReadDiaryNoteResponse
     }
 

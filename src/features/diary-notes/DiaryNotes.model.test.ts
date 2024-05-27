@@ -3,16 +3,13 @@ import {
     MutationCreateDiaryNoteArgs,
     MutationUpdateDiaryNoteArgs,
 } from "../../__generated__/types";
-import { MockDataSource } from "../../__mocks__/MockDataSource";
-import { MockRepository } from "../../__mocks__/MockRepository";
-import { DiaryNoteSchemaModel } from "./DiaryNote.schema";
+import { DiaryNoteRepository } from "./DiaryNote.repository";
 import { DiaryNotesModel } from "./DiaryNotes.model";
 import { DateTime } from "luxon";
 
 describe("DiaryNotesModel", () => {
     let diaryNotesModel: DiaryNotesModel;
-    let mockDataSource: MockDataSource;
-    let mockRepository: MockRepository;
+    let mockRepository: jest.Mocked<DiaryNoteRepository>;
     const mockDate = DateTime.now().toISO();
     const mockUpdatedData = DateTime.now().toISO();
     const expectedDiaryNote: DiaryNote = {
@@ -37,8 +34,17 @@ describe("DiaryNotesModel", () => {
         version: 1,
     };
     beforeEach(() => {
-        mockDataSource = new MockDataSource();
-        mockRepository = new MockRepository(mockDataSource);
+        mockRepository = {
+            create: jest.fn().mockResolvedValue(expectedDiaryNote),
+            update: jest.fn().mockResolvedValue(updatedDiaryNote),
+            deleteById: jest.fn().mockResolvedValue(true),
+            readById: jest.fn().mockResolvedValue(expectedDiaryNote),
+            readByField: jest.fn().mockResolvedValue([expectedDiaryNote]),
+            read: jest
+                .fn()
+                .mockResolvedValue({ data: [expectedDiaryNote], count: 1 }),
+        } as any;
+
         diaryNotesModel = new DiaryNotesModel(mockRepository);
     });
 
@@ -128,13 +134,9 @@ describe("DiaryNotesModel", () => {
     });
 
     it("should retrieve multiple diary notes and return data with count", async () => {
-        const expectedDiaryNotes = [
-            { id: "exampleId1", title: "example 1" },
-            { id: "exampleId2", title: "example 2" },
-        ];
-        const expectedData = { data: expectedDiaryNotes, count: 2 };
+        const expectedData = { data: [expectedDiaryNote], count: 1 };
         mockRepository.read.mockResolvedValue(expectedData);
-
+        1;
         const result = await diaryNotesModel.readMany(2, 0);
 
         expect(mockRepository.read).toHaveBeenCalledWith({

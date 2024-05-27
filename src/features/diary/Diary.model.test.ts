@@ -3,15 +3,13 @@ import {
     MutationCreateDiaryArgs,
     MutationUpdateDiaryArgs,
 } from "../../__generated__/types";
-import { MockDataSource } from "../../__mocks__/MockDataSource";
 import { DiaryModel } from "./Diary.model";
 import { DateTime } from "luxon";
-import { MockRepository } from "../../__mocks__/MockRepository";
+import { DiaryRepository } from "./Diary.repository";
 
 describe("DiaryModel", () => {
     let diaryModel: DiaryModel;
-    let mockDataSource: MockDataSource;
-    let mockRepository: MockRepository;
+    let mockRepository: jest.Mocked<DiaryRepository>;
     const mockDate = DateTime.now().toISO();
     const mockUpdatedData = DateTime.now().toISO();
     const expectedDiary: Diary = {
@@ -33,8 +31,17 @@ describe("DiaryModel", () => {
         version: 2,
     };
     beforeEach(() => {
-        mockDataSource = new MockDataSource();
-        mockRepository = new MockRepository(mockDataSource);
+        mockRepository = {
+            create: jest.fn().mockResolvedValue(expectedDiary),
+            update: jest.fn().mockResolvedValue(updatedDiary),
+            deleteById: jest.fn().mockResolvedValue(true),
+            readById: jest.fn().mockResolvedValue(expectedDiary),
+            readByField: jest.fn().mockResolvedValue([expectedDiary]),
+            read: jest
+                .fn()
+                .mockResolvedValue({ data: [expectedDiary], count: 1 }),
+        } as any;
+
         diaryModel = new DiaryModel(mockRepository);
     });
 
@@ -120,11 +127,7 @@ describe("DiaryModel", () => {
     });
 
     it("should retrieve multiple diary and return data with count", async () => {
-        const expectedDiarys = [
-            { id: "exampleId1", title: "example 1" },
-            { id: "exampleId2", title: "example 2" },
-        ];
-        const expectedData = { data: expectedDiarys, count: 2 };
+        const expectedData = { data: [expectedDiary], count: 1 };
         mockRepository.read.mockResolvedValue(expectedData);
 
         const result = await diaryModel.readMany(2, 0);

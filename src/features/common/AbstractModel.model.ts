@@ -1,6 +1,7 @@
 import { IReadManyAndCountResult } from "../../dataSources/DataSource.types";
 import { IFilterOpts, IRepository } from "./common.types";
 
+/** Encapsulated CRUD logic for models */
 export abstract class AbstractModel<CreateType, UpdateType, ResponseType> {
     protected repository: IRepository<
         CreateType,

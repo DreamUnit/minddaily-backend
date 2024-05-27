@@ -3,23 +3,15 @@ import {
     MutationCreateUserArgs,
     MutationUpdateUserArgs,
     User,
-    UserFilterOpts,
 } from "../../__generated__/types";
-import { IRepository } from "../common/common.types";
+import { UserRepository } from "./User.repository";
 
 export class UserModel extends AbstractModel<
     MutationCreateUserArgs,
     MutationUpdateUserArgs,
     User
 > {
-    constructor(
-        userRepository: IRepository<
-            Partial<User>,
-            Partial<User>,
-            UserFilterOpts,
-            User
-        >
-    ) {
+    constructor(userRepository: UserRepository) {
         super(userRepository);
     }
 }
