@@ -3,16 +3,13 @@ import {
     MutationUpdateUserArgs,
     User,
 } from "../../__generated__/types";
-import { MockDataSource } from "../../__mocks__/MockDataSource";
-import { MockRepository } from "../../__mocks__/MockRepository";
 import { UserModel } from "./User.model";
-import { UsersSchemaModel } from "./User.schema";
+import { UserRepository } from "./User.repository";
 import { DateTime } from "luxon";
 
 describe("UserModel", () => {
     let userModel: UserModel;
-    let mockDataSource: MockDataSource;
-    let mockRepository: MockRepository;
+    let mockRepository: jest.Mocked<UserRepository>;
     const mockDate = DateTime.now().toISO();
     const mockUpdatedDate = DateTime.now().toISO();
     const expectedData: User = {
@@ -43,8 +40,16 @@ describe("UserModel", () => {
     };
 
     beforeEach(() => {
-        mockDataSource = new MockDataSource();
-        mockRepository = new MockRepository(mockDataSource);
+        mockRepository = {
+            create: jest.fn().mockResolvedValue(expectedData),
+            update: jest.fn().mockResolvedValue(updatedUser),
+            deleteById: jest.fn().mockResolvedValue(true),
+            readById: jest.fn().mockResolvedValue(expectedData),
+            readByField: jest.fn().mockResolvedValue([expectedData]),
+            read: jest
+                .fn()
+                .mockResolvedValue({ data: [expectedData], count: 1 }),
+        } as any;
         userModel = new UserModel(mockRepository);
     });
 
@@ -80,7 +85,6 @@ describe("UserModel", () => {
         mockRepository.update.mockResolvedValue(updatedUser);
 
         const result = await userModel.update("123example", mockUpdateData);
-
         expect(mockRepository.update).toHaveBeenCalledWith(
             "123example",
             mockUpdateData
@@ -99,12 +103,12 @@ describe("UserModel", () => {
 
     it("should retrieve a user by id if user exists", async () => {
         const expectedUser = { id: "123example", name: "John Doe" };
-        mockRepository.readById.mockResolvedValue(expectedUser);
+        mockRepository.readById.mockResolvedValue(expectedData);
 
         const result = await userModel.readById("123example");
 
         expect(mockRepository.readById).toHaveBeenCalledWith("123example");
-        expect(result).toEqual(expectedUser);
+        expect(result).toEqual(expectedData);
     });
 
     it("should return null if no user is found by id", async () => {
@@ -116,8 +120,8 @@ describe("UserModel", () => {
     });
 
     it("should retrieve users by a specific field", async () => {
-        const users = [{ id: "123example", name: "John Doe" }];
-        mockRepository.readByField.mockResolvedValue(users);
+        const expectedUsers = [expectedData];
+        mockRepository.readByField.mockResolvedValue(expectedUsers);
 
         const result = await userModel.readByField({
             field: "name",
@@ -128,16 +132,12 @@ describe("UserModel", () => {
             field: "name",
             stringValue: "John Doe",
         });
-        expect(result).toEqual(users);
+        expect(result).toEqual(expectedUsers);
     });
 
     it("should retrieve multiple users and return data with count", async () => {
-        const users = [
-            { id: "123", name: "John Doe" },
-            { id: "124", name: "Jane Doe" },
-        ];
-        const expectedData = { data: users, count: 2 };
-        mockRepository.read.mockResolvedValue(expectedData);
+        const expectedUser = { data: [expectedData], count: 1 };
+        mockRepository.read.mockResolvedValue(expectedUser);
 
         const result = await userModel.readMany(2, 0);
 
@@ -145,6 +145,6 @@ describe("UserModel", () => {
             take: 2,
             skip: 0,
         });
-        expect(result).toEqual(expectedData);
+        expect(result).toEqual(expectedUser);
     });
 });

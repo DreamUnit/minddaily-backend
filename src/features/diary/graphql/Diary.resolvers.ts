@@ -1,4 +1,3 @@
-import { DatasourceManager } from "../../../config/DatasourceManager.service";
 import {
     DeleteResponse,
     DiaryResolvers,

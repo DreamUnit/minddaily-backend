@@ -33,13 +33,12 @@ app.use(
         credentials: true,
     })
 );
-console.log("cors origin:", process.env.CORS_DOMAINS.split(","));
 
 export const httpServer = http.createServer(app);
 export const apolloServer = new ApolloServer<DataSourceContext>({
     schema: makeExecutableSchema({ typeDefs, resolvers }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: false,
+    introspection: process.env.NODE_ENV === "development",
 });
 
 app.use(session(sessionConfig));

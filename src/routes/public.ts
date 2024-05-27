@@ -5,7 +5,6 @@ import authController from "../controllers/index.controller";
 const router = express.Router();
 
 router.get("/auth/google", (req, res, next) => {
-    console.log("called auth route with query:", req.query, "body: ", req.body);
     passport.authenticate("google", { scope: ["profile", "email"] })(
         req,
         res,
@@ -16,13 +15,6 @@ router.get("/auth/google", (req, res, next) => {
 router.get(
     "/auth/google/callback",
     (req, res, next) => {
-        console.log(
-            "google callback called with req:",
-            req.query,
-            "body:",
-            req.body
-        );
-
         passport.authenticate("google", {
             failureRedirect: "/login",
             failureMessage: true,

@@ -1,13 +1,11 @@
 import jwt from "jsonwebtoken";
 
 export function authenticateToken(req, res, next) {
-    // if (process.env.NODE_ENV === "development" && req.path === "/") {
-    //     return next();
-    // }
+    if (process.env.NODE_ENV === "development" && req.path === "/") {
+        return next();
+    }
 
     const token = req.cookies.jwtToken;
-
-    console.log("token:", token);
     if (token == null)
         return res.send({
             code: 401,

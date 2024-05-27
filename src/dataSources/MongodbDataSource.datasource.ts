@@ -2,14 +2,7 @@ import { IDataSource } from "./DataSource.datasource.js";
 
 import { ILogger } from "../utils/Logger.types.js";
 import mongoose from "mongoose";
-import {
-    IDeleteOpts,
-    IReadOpts,
-    IReadManyAndCountResult,
-    IUpdateOpts,
-    IWriteOpts,
-    IReadByFieldOpts,
-} from "./DataSource.types.js";
+import { IReadOpts, IWriteOpts } from "./DataSource.types.js";
 
 export class MongodbDataSource implements IDataSource {
     private connectionString: string;
@@ -40,23 +33,11 @@ export class MongodbDataSource implements IDataSource {
         }
     }
 
-    async softDelete<R, MongoModel>(opts: IDeleteOpts<MongoModel>): Promise<R> {
-        const model = mongoose.model(opts.source);
-        const document = await model
-            .findByIdAndUpdate(
-                opts.id,
-                { deletedDate: new Date() },
-                { new: true }
-            )
-            .exec();
-        return document;
-    }
-
-    // Need to fix so it fetches count and considers filters and count
+    /** probablly need to pass the response from the repositrory */
     public async read<Filter, R>(
         source: string,
         opts: IReadOpts<Filter>
-    ): Promise<IReadManyAndCountResult<R>> {
+    ): Promise<R> {
         const model = mongoose.model(source);
         let query = model.find(opts.query);
         const countQuery = model.find(opts.query).merge(query);
@@ -81,35 +62,31 @@ export class MongodbDataSource implements IDataSource {
         const documents = await query.exec();
         const count = await countQuery.countDocuments().exec();
 
-        return { data: documents, count };
-    }
-
-    public async readById<R>(source: string, id: string | number): Promise<R> {
-        const model = mongoose.model(source);
-        const document = await model.findById(id).exec();
-        return document;
-    }
-
-    public async readByField<R>(opts: IReadByFieldOpts): Promise<R[] | null> {
-        const { source, field, value } = opts;
-
-        const model = mongoose.model<R>(source);
-        const query = { [field]: value } as mongoose.FilterQuery<R>;
-        const document = await model.find(query).exec();
-        return document;
-    }
-
-    public async update<T, Query, R>(opts: IUpdateOpts<T, Query>): Promise<R> {
-        const model = mongoose.model(opts.source);
-        const document = await model
-            .findByIdAndUpdate(opts.id, opts.data, { new: true })
-            .exec();
-        return document;
+        return { data: documents, count } as R;
     }
 
     public async write<T, MongoModel, R>(
         opts: IWriteOpts<T, MongoModel>
     ): Promise<R> {
+        if (opts.delete) {
+            const isValid = mongoose.Types.ObjectId.isValid(opts.data["id"]);
+            if (!isValid) {
+                return false as R;
+            }
+
+            const result = await opts.schemaModel
+                .deleteOne({ _id: opts.data["id"] })
+                .exec();
+            return result.acknowledged && ((result.deletedCount > 0) as R);
+        }
+
+        if (opts.update) {
+            const updatedDocument = await opts.schemaModel
+                .findByIdAndUpdate(opts.data["_id"], opts.data, { new: true })
+                .exec();
+
+            return updatedDocument as R;
+        }
         const document = new opts.schemaModel(opts.data);
         await document.save();
 
@@ -117,19 +94,5 @@ export class MongodbDataSource implements IDataSource {
             .findById(document._id)
             .exec();
         return savedDocument as R;
-    }
-
-    public async deleteById<T, MongoModel>(
-        opts: IDeleteOpts<MongoModel>
-    ): Promise<boolean> {
-        const isValid = mongoose.Types.ObjectId.isValid(opts.id);
-        if (!isValid) {
-            return false;
-        }
-
-        const result = await opts.schemaModel
-            .deleteOne({ _id: opts.id })
-            .exec();
-        return result.acknowledged && result.deletedCount > 0;
     }
 }
