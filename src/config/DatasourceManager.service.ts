@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import path from "path";
-import { MongodbDataSource } from "../dataSources/MongodbDataSource.datasource";
 import { IDataSource } from "../dataSources/DataSource.datasource";
 import { LoggerManager } from "./LoggerManager.service";
 
@@ -24,25 +23,24 @@ export class DatasourceManager {
 
     /** Dynamically create Data Source dependent on .env variable */
     private constructor() {
-        const type = process.env.DATABASE_TYPE;
-        switch (type) {
-            case "mongodb":
-                this.dataSource = new MongodbDataSource(
-                    process.env.MONGODB_DSN,
-                    LoggerManager.getInstance().logger
-                );
-                break;
-            case "sql":
-                throw new Error("Not implemented yet");
-            default:
-                throw new Error("Invalid or unsupported data source type");
+        const dataSourceClassName = `${process.env.DATABASE_TYPE}DataSource`;
+        try {
+            const dataSourceModule = require(`../dataSources/${dataSourceClassName}.datasource`);
+            const dataSourceClass = dataSourceModule[dataSourceClassName];
+            this.dataSource = new dataSourceClass(
+                process.env[`${process.env.DATABASE_TYPE.toUpperCase()}_DSN`],
+                LoggerManager.getInstance().logger
+            );
+        } catch (error) {
+            throw new Error(
+                `Unknown Adapter Type: ${process.env.DATABASE_TYPE} - ${error.message}`
+            );
         }
     }
 
     public static getInstance(): DatasourceManager {
-        if (!DatasourceManager.instance) {
-            DatasourceManager.instance = new DatasourceManager();
-        }
-        return DatasourceManager.instance;
+        return DatasourceManager.instance
+            ? DatasourceManager.instance
+            : (DatasourceManager.instance = new DatasourceManager());
     }
 }
