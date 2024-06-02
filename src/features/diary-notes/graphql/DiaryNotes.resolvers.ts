@@ -14,10 +14,8 @@ import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
 import { DiaryNotesModel } from "../DiaryNotes.model";
 
 export class DiaryNotesResolver extends AbstractResolver {
-    private readonly diaryNotesModel: DiaryNotesModel;
-    constructor(diaryNotesModel: DiaryNotesModel) {
+    constructor(private readonly diaryNotesModel: DiaryNotesModel) {
         super();
-        this.diaryNotesModel = diaryNotesModel;
     }
     private query: QueryResolvers = {
         readDiaryNotes: async (

@@ -1,5 +1,6 @@
 import {
     DeleteResponse,
+    DiaryNote,
     DiaryResolvers,
     MutationCreateDiaryArgs,
     MutationDeleteDiaryArgs,
@@ -12,25 +13,21 @@ import {
     ReadDiaryResponse,
 } from "../../../__generated__/types";
 import { DiaryModel } from "../Diary.model";
-
 import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
 import { DiaryNotesModel } from "../../diary-notes/DiaryNotes.model";
 import { Logger } from "../../../utils/Logger.util";
+import DataLoader from "dataloader";
 
 export class DiaryResolver extends AbstractResolver {
-    private readonly diaryModel: DiaryModel;
-    private readonly diaryNotesModel: DiaryNotesModel;
-    private readonly logger: Logger;
+    private readonly DiaryNoteLoader: DataLoader<string, DiaryNote[]> =
+        new DataLoader(ids => this.getNotesByDiaryIds(ids));
 
     constructor(
-        diaryModel: DiaryModel,
-        diaryNotesModel: DiaryNotesModel,
-        logger: Logger
+        private readonly diaryModel: DiaryModel,
+        private readonly diaryNotesModel: DiaryNotesModel,
+        private readonly logger: Logger
     ) {
         super();
-        this.diaryModel = diaryModel;
-        this.diaryNotesModel = diaryNotesModel;
-        this.logger = logger;
     }
     private query: QueryResolvers = {
         readDiaries: async (
@@ -157,16 +154,26 @@ export class DiaryResolver extends AbstractResolver {
     private diary: DiaryResolvers = {
         notes: async parent => {
             try {
-                const diaryNotes = await this.diaryNotesModel.readByField({
-                    field: "diaryId",
-                    stringValue: parent.id,
-                });
-                return diaryNotes;
+                const notes = this.DiaryNoteLoader.load(parent.id);
+                return notes;
             } catch (err) {
                 this.logger.error("Error fetching diaries :", err);
             }
         },
     };
+
+    private async getNotesByDiaryIds(
+        ids: readonly string[]
+    ): Promise<DiaryNote[][]> {
+        const mappedNotes = ids.map(id => {
+            return this.diaryNotesModel.readByField({
+                field: "diaryId",
+                stringValue: id as string,
+            });
+        });
+        const notes = await Promise.all(mappedNotes);
+        return notes;
+    }
 
     public getResolvers() {
         return {
