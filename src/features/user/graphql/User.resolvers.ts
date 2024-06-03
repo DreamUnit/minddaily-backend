@@ -1,5 +1,6 @@
 import {
     DeleteResponse,
+    Diary,
     MutationCreateUserArgs,
     MutationDeleteUserArgs,
     MutationResolvers,
@@ -15,17 +16,19 @@ import { UserModel } from "../User.model";
 import { Logger } from "../../../utils/Logger.util";
 import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
 import { DiaryModel } from "../../diary/Diary.model";
+import DataLoader from "dataloader";
 
 export class UserResolver extends AbstractResolver {
-    private readonly userModel: UserModel;
-    private readonly diaryModel: DiaryModel;
-    private readonly logger: Logger;
+    private diaryLoader: DataLoader<string, Diary[]> = new DataLoader(ids =>
+        this.getDiariesByUserIds(ids)
+    );
 
-    constructor(userModel: UserModel, diaryModel: DiaryModel, logger: Logger) {
+    constructor(
+        private readonly userModel: UserModel,
+        private readonly diaryModel: DiaryModel,
+        private readonly logger: Logger
+    ) {
         super();
-        this.userModel = userModel;
-        this.diaryModel = diaryModel;
-        this.logger = logger;
     }
 
     private query: QueryResolvers = {
@@ -167,16 +170,26 @@ export class UserResolver extends AbstractResolver {
     private user: UserResolvers = {
         diaries: async parent => {
             try {
-                const diaries = await this.diaryModel.readByField({
-                    field: "userId",
-                    stringValue: parent.id,
-                });
+                const diaries = await this.diaryLoader.load(parent.id);
                 return diaries;
             } catch (err) {
                 this.logger.error("Error fetching diaries :", err);
             }
         },
     };
+
+    private async getDiariesByUserIds(
+        ids: readonly string[]
+    ): Promise<Diary[][]> {
+        const mappedDiaries = ids.map(id => {
+            return this.diaryModel.readByField({
+                field: "userId",
+                stringValue: id as string,
+            });
+        });
+        const diaries = await Promise.all(mappedDiaries);
+        return diaries;
+    }
 
     public getResolvers() {
         return {
