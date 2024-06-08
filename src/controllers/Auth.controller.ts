@@ -12,8 +12,11 @@ class AuthController extends AbstractController {
         );
         res.cookie("jwtToken", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+            secure: false,
+            sameSite: "lax",
+            // use this code when we setup https
+            // secure: process.env.NODE_ENV === "production",
+            // sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
             overWrite: true,
             path: "/",
         });
