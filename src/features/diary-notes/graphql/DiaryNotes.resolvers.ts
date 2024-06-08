@@ -14,7 +14,7 @@ import { AbstractResolver } from "../../common/AbstractResolver.resolvers";
 import { DiaryNotesModel } from "../DiaryNotes.model";
 
 export class DiaryNotesResolver extends AbstractResolver {
-    constructor(private readonly diaryNotesModel: DiaryNotesModel) {
+    constructor(private readonly _diaryNotesModel: DiaryNotesModel) {
         super();
     }
     private query: QueryResolvers = {
@@ -23,7 +23,7 @@ export class DiaryNotesResolver extends AbstractResolver {
             { take, skip }: QueryReadDiaryNotesArgs
         ): Promise<ReadDiaryNotesResponse> => {
             try {
-                const { data, count } = await this.diaryNotesModel.readMany(
+                const { data, count } = await this._diaryNotesModel.readMany(
                     take,
                     skip
                 );
@@ -50,7 +50,7 @@ export class DiaryNotesResolver extends AbstractResolver {
             { id }: QueryReadDiaryNoteByIdArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await this.diaryNotesModel.readById(id);
+                const data = await this._diaryNotesModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -74,7 +74,7 @@ export class DiaryNotesResolver extends AbstractResolver {
             { title, text, diaryId }: MutationCreateDiaryNoteArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await this.diaryNotesModel.create({
+                const data = await this._diaryNotesModel.create({
                     title: title,
                     text: text,
                     diaryId: diaryId,
@@ -100,7 +100,7 @@ export class DiaryNotesResolver extends AbstractResolver {
             { id, title, text }: MutationUpdateDiaryNoteArgs
         ): Promise<ReadDiaryNoteResponse> => {
             try {
-                const data = await this.diaryNotesModel.update(id, {
+                const data = await this._diaryNotesModel.update(id, {
                     id,
                     title: title,
                     text: text,
@@ -126,7 +126,7 @@ export class DiaryNotesResolver extends AbstractResolver {
             { id }: MutationDeleteDiaryNoteArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await this.diaryNotesModel.delete(id);
+                const data = await this._diaryNotesModel.delete(id);
                 return {
                     code: 200,
                     success: true,

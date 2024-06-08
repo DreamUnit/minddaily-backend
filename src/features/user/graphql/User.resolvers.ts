@@ -19,14 +19,14 @@ import { DiaryModel } from "../../diary/Diary.model";
 import DataLoader from "dataloader";
 
 export class UserResolver extends AbstractResolver {
-    private diaryLoader: DataLoader<string, Diary[]> = new DataLoader(ids =>
+    private _diaryLoader: DataLoader<string, Diary[]> = new DataLoader(ids =>
         this.getDiariesByUserIds(ids)
     );
 
     constructor(
-        private readonly userModel: UserModel,
-        private readonly diaryModel: DiaryModel,
-        private readonly logger: Logger
+        private readonly _userModel: UserModel,
+        private readonly _diaryModel: DiaryModel,
+        private readonly _logger: Logger
     ) {
         super();
     }
@@ -37,7 +37,7 @@ export class UserResolver extends AbstractResolver {
             { take, skip }: QueryReadUsersArgs
         ): Promise<ReadUsersResponse> => {
             try {
-                const data = await this.userModel.readMany(take, skip);
+                const data = await this._userModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
@@ -61,7 +61,7 @@ export class UserResolver extends AbstractResolver {
             { id }: QueryReadUserByIdArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await this.userModel.readById(id);
+                const data = await this._userModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -85,7 +85,7 @@ export class UserResolver extends AbstractResolver {
             { authUserId, name, email, locale }: MutationCreateUserArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await this.userModel.create({
+                const data = await this._userModel.create({
                     authUserId: authUserId,
                     name: name,
                     email: email,
@@ -121,7 +121,7 @@ export class UserResolver extends AbstractResolver {
             }: MutationUpdateUserArgs
         ): Promise<ReadUserResponse> => {
             try {
-                const data = await this.userModel.update(id, {
+                const data = await this._userModel.update(id, {
                     id,
                     name,
                     email,
@@ -151,7 +151,7 @@ export class UserResolver extends AbstractResolver {
             { id }: MutationDeleteUserArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await this.userModel.delete(id);
+                const data = await this._userModel.delete(id);
                 return {
                     code: 200,
                     success: true,
@@ -170,10 +170,10 @@ export class UserResolver extends AbstractResolver {
     private user: UserResolvers = {
         diaries: async parent => {
             try {
-                const diaries = await this.diaryLoader.load(parent.id);
+                const diaries = await this._diaryLoader.load(parent.id);
                 return diaries;
             } catch (err) {
-                this.logger.error("Error fetching diaries :", err);
+                this._logger.error("Error fetching diaries :", err);
             }
         },
     };
@@ -182,7 +182,7 @@ export class UserResolver extends AbstractResolver {
         ids: readonly string[]
     ): Promise<Diary[][]> {
         const mappedDiaries = ids.map(id => {
-            return this.diaryModel.readByField({
+            return this._diaryModel.readByField({
                 field: "userId",
                 stringValue: id as string,
             });

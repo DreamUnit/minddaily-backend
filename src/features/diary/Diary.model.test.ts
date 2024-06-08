@@ -120,8 +120,7 @@ describe("DiaryModel", () => {
         });
 
         expect(mockRepository.readByField).toHaveBeenCalledWith({
-            field: "title",
-            stringValue: "example title",
+            title: "example title",
         });
         expect(result).toEqual(expectedDiarys);
     });

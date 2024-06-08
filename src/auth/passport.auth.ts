@@ -17,7 +17,7 @@ const googleStrategy = new GoogleStrategy(
                 authUserId: profile.id,
                 name: `${profile.name.givenName} ${profile.name.familyName}`,
                 email: profile.emails[0].value,
-                locale: profile._json.locale,
+                locale: profile._json.locale || "unknown",
             });
             return cb(null, newUser);
         }

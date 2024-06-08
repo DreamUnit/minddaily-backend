@@ -23,9 +23,9 @@ export class DiaryResolver extends AbstractResolver {
         new DataLoader(ids => this.getNotesByDiaryIds(ids));
 
     constructor(
-        private readonly diaryModel: DiaryModel,
-        private readonly diaryNotesModel: DiaryNotesModel,
-        private readonly logger: Logger
+        private readonly _diaryModel: DiaryModel,
+        private readonly _diaryNotesModel: DiaryNotesModel,
+        private readonly _logger: Logger
     ) {
         super();
     }
@@ -35,7 +35,7 @@ export class DiaryResolver extends AbstractResolver {
             { take, skip }: QueryReadDiariesArgs
         ): Promise<ReadDiariesResponse> => {
             try {
-                const data = await this.diaryModel.readMany(take, skip);
+                const data = await this._diaryModel.readMany(take, skip);
                 return {
                     code: 200,
                     success: true,
@@ -59,7 +59,7 @@ export class DiaryResolver extends AbstractResolver {
             { id }: QueryReadDiaryByIdArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await this.diaryModel.readById(id);
+                const data = await this._diaryModel.readById(id);
                 return {
                     code: 200,
                     success: true,
@@ -83,7 +83,7 @@ export class DiaryResolver extends AbstractResolver {
             { userId, title }: MutationCreateDiaryArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await this.diaryModel.create({
+                const data = await this._diaryModel.create({
                     userId,
                     title,
                 });
@@ -109,7 +109,7 @@ export class DiaryResolver extends AbstractResolver {
             { id, userId, title }: MutationUpdateDiaryArgs
         ): Promise<ReadDiaryResponse> => {
             try {
-                const data = await this.diaryModel.update(id, {
+                const data = await this._diaryModel.update(id, {
                     id,
                     userId,
                     title,
@@ -135,7 +135,7 @@ export class DiaryResolver extends AbstractResolver {
             { id }: MutationDeleteDiaryArgs
         ): Promise<DeleteResponse> => {
             try {
-                const data = await this.diaryModel.delete(id);
+                const data = await this._diaryModel.delete(id);
                 return {
                     code: 200,
                     success: true,
@@ -157,7 +157,7 @@ export class DiaryResolver extends AbstractResolver {
                 const notes = this.DiaryNoteLoader.load(parent.id);
                 return notes;
             } catch (err) {
-                this.logger.error("Error fetching diaries :", err);
+                this._logger.error("Error fetching diaries :", err);
             }
         },
     };
@@ -166,7 +166,7 @@ export class DiaryResolver extends AbstractResolver {
         ids: readonly string[]
     ): Promise<DiaryNote[][]> {
         const mappedNotes = ids.map(id => {
-            return this.diaryNotesModel.readByField({
+            return this._diaryNotesModel.readByField({
                 field: "diaryId",
                 stringValue: id as string,
             });

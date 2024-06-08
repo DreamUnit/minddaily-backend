@@ -129,8 +129,7 @@ describe("UserModel", () => {
         });
 
         expect(mockRepository.readByField).toHaveBeenCalledWith({
-            field: "name",
-            stringValue: "John Doe",
+            name: "John Doe",
         });
         expect(result).toEqual(expectedUsers);
     });

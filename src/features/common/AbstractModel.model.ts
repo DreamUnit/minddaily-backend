@@ -40,7 +40,6 @@ export abstract class AbstractModel<CreateType, UpdateType, ResponseType> {
         } else if (stringValue !== undefined) {
             filter[field] = stringValue;
         }
-
         const queryResult = await this.repository.readByField(filter);
         return Array.isArray(queryResult) ? queryResult : [queryResult];
     }
