@@ -31,4 +31,18 @@ router.get("/health", (req, res) => {
     });
 });
 
+router.get("/test", (req, res) => {
+    res.cookie("jwtToken", "tokenExample", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        // use this code when we setup https
+        // secure: process.env.NODE_ENV === "production",
+        // sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+        path: "/",
+    });
+
+    res.redirect(`${process.env.CLIENTSIDE_URL}/dashboard/diaries`);
+});
+
 export default router;
