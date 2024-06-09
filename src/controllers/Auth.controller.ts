@@ -17,8 +17,13 @@ class AuthController extends AbstractController {
             // use this code when we setup https
             // secure: process.env.NODE_ENV === "production",
             // sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-            overWrite: true,
+            overwrite: true,
             path: "/",
+            // change this to environment variable in the future.
+            domain:
+                process.env.NODE_ENV === "production"
+                    ? ".joshibbotson.com"
+                    : undefined,
         });
 
         res.redirect(`${process.env.CLIENTSIDE_URL}/dashboard/diaries`);
