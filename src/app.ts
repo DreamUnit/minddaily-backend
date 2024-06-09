@@ -27,12 +27,29 @@ dotenv.config({
 export const app = express();
 app.use(cookieParser());
 app.use(express.json());
-app.use(
-    cors<cors.CorsRequest>({
-        origin: process.env.CORS_DOMAINS.split(","),
-        credentials: true,
-    })
-);
+// app.use(
+//     cors<cors.CorsRequest>({
+//         origin: process.env.CORS_DOMAINS.split(","),
+//         credentials: true,
+//     })
+// );
+console.log(process.env.CORS_DOMAINS.split(","));
+const corsOptions = {
+    origin: function (origin, callback) {
+        console.log("origin:", origin);
+        const allowedDomains = process.env.CORS_DOMAINS.split(",");
+        if (allowedDomains.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            console.log("failing origin:", origin);
+
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 export const httpServer = http.createServer(app);
 export const apolloServer = new ApolloServer<DataSourceContext>({
