@@ -1,71 +1,71 @@
 name: Staging 🏗
 
 on:
-  workflow_dispatch:
-    inputs:
-      runTeardown:
-        description: "Run teardown job (yes/no)"
-        required: true
-        default: "no"
+    workflow_dispatch:
+        inputs:
+            runTeardown:
+                description: "Run teardown job (yes/no)"
+                required: true
+                default: "no"
 
 jobs:
-  build:
-    name: Build and publish image 🛠️
-    runs-on: ubuntu-latest
+    build:
+        name: Build and publish image 🛠️
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository 🔎
-        uses: actions/checkout@v2
+        steps:
+            - name: Checkout repository 🔎
+              uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx ⚒️
-        uses: docker/setup-buildx-action@v1
+            - name: Set up Docker Buildx ⚒️
+              uses: docker/setup-buildx-action@v1
 
-      - name: Login to DockerHub 🔑
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+            - name: Login to DockerHub 🔑
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker image 🐳📦
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./docker/staging/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
-          platforms: linux/amd64,linux/arm64
+            - name: Build and Push Docker image 🐳📦
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  file: ./docker/staging/Dockerfile
+                  push: true
+                  tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+                  platforms: linux/amd64,linux/arm64
 
-  deploy:
-    needs: build
-    name: Deploy image 🚀
-    runs-on: ubuntu-latest
+    deploy:
+        needs: build
+        name: Deploy image 🚀
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Pull and run container 🏃️
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          script: |
-              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
-              docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
-              docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
-              docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+        steps:
+            - name: Pull and run container 🏃️
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+                      docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+                      docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+                      docker run -d -p 8083:8083 --env-file=/home/ubuntu/repos/staging.env --name ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
 
-  teardown-staging:
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
-    runs-on: ubuntu-latest
+    teardown-staging:
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.runTeardown == 'yes' }}
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Teardown staging server 👷🏼
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          script: |
-            docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
-            docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
-            docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
-            docker system prune -af
+        steps:
+            - name: Teardown staging server 👷🏼
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.SSHKEY }}
+                  script: |
+                      docker stop ${{ secrets.DOCKER_STAGE_IMAGE_NAME }} || true
+                      docker rm ${{ secrets.DOCKER_STAGE_IMAGE_NAME }}
+                      docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_STAGE_IMAGE_NAME }}:latest
+                      docker system prune -af
